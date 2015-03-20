@@ -17,6 +17,7 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <span id="controls">
 <br/>
+<button id="create" onclick="createTree()">new genealogy</button>
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
 </span>
@@ -28,14 +29,24 @@ var width = 800,
 var popsize = 20;
 var maxgens = 27;
 //var delay = 750;
-//var delay = 100;
+var delay = 100;
 //delay = 0; // DEBUG
-
-var tree, root, nodes;
 
 var firsttick = true;
 
-/////////////////////////////////////
+var tree, root, nodes;
+
+
+//var diagonal = d3.svg.diagonal();
+
+// Drop-in straight-line replacement for diagonal() based on
+// elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
+function line(d){
+    var linemaker = d3.svg.line().x( function(point) { return point.lx; })
+                                 .y( function(point) { return point.ly; });
+    return linemaker([{lx: d.source.x, ly: d.source.y},
+                      {lx: d.target.x, ly: d.target.y}]);
+}
 
 var svg = d3.select("body").insert("svg", "#controls")
     .attr("width", width)
@@ -46,48 +57,36 @@ var svg = d3.select("body").insert("svg", "#controls")
 var node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
 
-createTreeData();
-createSVG();
+function createTree () {
+    svg.selectAll("circle").remove();
+    svg.selectAll("path").remove();
 
-/////////////////////////////////////
-
-function createTreeData () {
     tree = d3.layout.tree()
         .size([width - 20, height - 20])
-        .separation(function (a, b) {return a.parent == b.parent ? 7 : 8;}) // does this work??
-        ;
-
+        .separation(function (a, b) {return a.parent == b.parent ? 7 : 8;}); // does this work??
+    
     root = {};
     nodes = tree.nodes(root);
-
     root.parent = root;
     root.px = root.x;
     root.py = root.y;
 
-    console.log(nodes);
-
-    for (j = 0; j <= maxgens; j++) {  // note include generation maxgens.  "generation 0" is just scaffolding, and not part of the model.
-        //var currgen = generation(j);
-        var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
-	var currgen = generation(gennum);
-	console.log("j = "+j+", gennum = "+gennum);
-	console.log(currgen);
-
-        //tree.nodes(root);
-        //tree.links(nodes);
-
-        // Randomly create exactly popsize children
-        for (i = 0; i < popsize; i++) {
-            var n = {id: nodes.length},
-                p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,nodes.length).
-            if (p.children) p.children.push(n); else p.children = [n];
-            nodes.push(n);
-        }
+    for (j=0; j<=maxgens; j++) {
+        update();
     }
 }
 
+function update() {
+  var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
+  var currgen = generation(gennum);
 
-function createSVG() {
+  // Randomly create exactly popsize children
+  for (i=0; i < popsize; i++) {
+      var n = {id: nodes.length},
+          p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,nodes.length).
+      if (p.children) p.children.push(n); else p.children = [n];
+      nodes.push(n);
+  }
 
   // Recompute the layout and data join.
   node = node.data(tree.nodes(root), function(d) { return d.id; });
@@ -127,8 +126,7 @@ function createSVG() {
   t.selectAll(".node")
       .attr("cx", function(d) { return d.px = d.x; })
       .attr("cy", function(d) { return d.py = d.y; });
-} // end of createSVG
-
+}
 
 function generation (n) {
     return nodes.filter(function (d) {return d.depth === n;});
@@ -214,15 +212,6 @@ function unhideExtinct () {
     link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
-}
-
-// Drop-in straight-line replacement for diagonal() based on
-// elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
-function line(d){
-    var linemaker = d3.svg.line().x( function(point) { return point.lx; })
-                                 .y( function(point) { return point.ly; });
-    return linemaker([{lx: d.source.x, ly: d.source.y},
-                      {lx: d.target.x, ly: d.target.y}]);
 }
 
 </script>
