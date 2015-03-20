@@ -17,8 +17,8 @@
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <span id="controls">
 <br/>
-<button id="mark" onclick="toggleMarked()">mark/unmark coalescent</button>
-<button id="extinct" onclick="toggleExtinct()">hide/show extinct lineages</button>
+<button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
+<button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
 </span>
 <script>
 
@@ -59,7 +59,7 @@ function line(d){
 var svg = d3.select("body").insert("svg", "#controls")
     .attr("width", width)
     .attr("height", height)
-  .append("g")
+    .append("g")
     .attr("transform", "translate(10,10)");
 
 var node = svg.selectAll(".node"),
@@ -73,7 +73,6 @@ function update() {
   if (currgen[0].depth >= maxgens) {
     return clearInterval(timer);
   }
-
 
   // Randomly create exactly popsize children
   for (i=0; i < popsize; i++) {
@@ -138,40 +137,40 @@ function ancestors (currnodes, stop, accnodes, acclinks) {
    }
 }
 
-var coaldata = undefined;
-function fillCoalData (){
+var ancdata = undefined;
+function fillAncData (){
   var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
   var currgen = generation(gennum);
-  coaldata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+  ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
 }
 
-var coalescentMarked = false;
+var ancestorsMarked = false;
 function toggleMarked () {
-    if (coalescentMarked) {
-        coalescentMarked = false;
-        unmarkCoalescent();
+    if (ancestorsMarked) {
+        ancestorsMarked = false;
+        unmarkAncestors();
     } else {
-        coalescentMarked = true;
-        markCoalescent();
+        ancestorsMarked = true;
+        markAncestors();
     }
 }
 
-function markCoalescent () {
-    if (!coaldata)
-        fillCoalData();
-    node.data(coaldata[0], function(d){return d.id;})
+function markAncestors () {
+    if (!ancdata)
+        fillAncData();
+    node.data(ancdata[0], function(d){return d.id;})
         .style("fill", "red");
-    link.data(coaldata[1], function(d){return d.source.id + "-" + d.target.id;})
+    link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "2")
         .style("stroke", "red");
 }
 
-function unmarkCoalescent () {
-    if (!coaldata)
-        fillCoalData();
-    node.data(coaldata[0], function(d){return d.id;})
+function unmarkAncestors () {
+    if (!ancdata)
+        fillAncData();
+    node.data(ancdata[0], function(d){return d.id;})
         .style("fill", "black");
-    link.data(coaldata[1], function(d){return d.source.id + "-" + d.target.id;})
+    link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "1")
         .style("stroke", "black");
 }
@@ -188,23 +187,23 @@ function toggleExtinct () {
 }
 
 function hideExtinct () {
-    if (!coaldata)
-        fillCoalData();
-    node.data(coaldata[0], function(d){return d.id;})
+    if (!ancdata)
+        fillAncData();
+    node.data(ancdata[0], function(d){return d.id;})
         .exit()
 	.attr("opacity", 0);
-    link.data(coaldata[1], function(d){return d.source.id + "-" + d.target.id;})
+    link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
 	.attr("opacity", 0);
 }
 
 function unhideExtinct () {
-    if (!coaldata)
-        fillCoalData(); // should be redundant
-    node.data(coaldata[0], function(d){return d.id;})
+    if (!ancdata)
+        fillAncData(); // should be redundant
+    node.data(ancdata[0], function(d){return d.id;})
         .exit()
         .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
-    link.data(coaldata[1], function(d){return d.source.id + "-" + d.target.id;})
+    link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
