@@ -2,7 +2,7 @@
 Diagrams for lessons on the coalescent<br/>
 i.e. programs that may be useful for teaching coalescent concepts.
 
-All new text and software is copyright 2014 by Marshall Abrams. The
+All new text and software is copyright 2015 by Marshall Abrams. The
 software is distributed under the Gnu General Public License version
 3.0, available in the file LICENSE.
 
