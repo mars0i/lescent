@@ -28,23 +28,14 @@ var width = 800,
 var popsize = 20;
 var maxgens = 27;
 //var delay = 750;
-var delay = 100;
+//var delay = 100;
 //delay = 0; // DEBUG
 
 var tree, root, nodes;
 
 var firsttick = true;
 
-//var diagonal = d3.svg.diagonal();
-
-// Drop-in straight-line replacement for diagonal() based on
-// elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
-function line(d){
-    var linemaker = d3.svg.line().x( function(point) { return point.lx; })
-                                 .y( function(point) { return point.ly; });
-    return linemaker([{lx: d.source.x, ly: d.source.y},
-                      {lx: d.target.x, ly: d.target.y}]);
-}
+/////////////////////////////////////
 
 var svg = d3.select("body").insert("svg", "#controls")
     .attr("width", width)
@@ -73,8 +64,14 @@ function createTreeData () {
     root.px = root.x;
     root.py = root.y;
 
-    for (j = 1; j <= maxgens; j++) {  // note start at 1 to skip root, and include generation maxgens.
+    console.log(nodes);
+
+    for (j = 0; j <= maxgens; j++) {  // note include generation maxgens.  "generation 0" is just scaffolding, and not part of the model.
         var currgen = generation(j);
+	console.log(currgen);
+
+        tree.nodes(root);
+        tree.links(nodes);
 
         // Randomly create exactly popsize children
         for (i = 0; i < popsize; i++) {
@@ -214,6 +211,15 @@ function unhideExtinct () {
     link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+}
+
+// Drop-in straight-line replacement for diagonal() based on
+// elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
+function line(d){
+    var linemaker = d3.svg.line().x( function(point) { return point.lx; })
+                                 .y( function(point) { return point.ly; });
+    return linemaker([{lx: d.source.x, ly: d.source.y},
+                      {lx: d.target.x, ly: d.target.y}]);
 }
 
 </script>
