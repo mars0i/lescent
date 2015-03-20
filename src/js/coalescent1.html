@@ -34,7 +34,9 @@ var delay = 100;
 var firsttick = true;
 
 var tree = d3.layout.tree()
-    .size([width - 20, height - 20]);
+    .size([width - 20, height - 20])
+    //.separation(function (a, b) {return a.parent == b.parent ? 1 : 2;}) // does this work??
+    ;
 
 var root = {},
     nodes = tree.nodes(root);
