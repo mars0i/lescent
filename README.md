@@ -11,10 +11,10 @@ https://gist.github.com/mbostock/999346 .
 
 ##### lescent1.html:
 
-Generates a random geneology, and then allows you to highlight the
+Generates a random genealogy, and then allows you to highlight the
 ancestors of everyone in the last generation.  The program is a forward
 Wright-Fisher simulation, not a coalescent simulation.  However,
-comparing the geneology of the current generation with all lineages
+comparing the genealogy of the current generation with all lineages
 starting from the same population helps one to understand the utility of
 coalescent simulations.
 
@@ -22,6 +22,13 @@ Note that "Wright-Fisher model" in the context of coalescent modeling
 doesn't imply that there are multiple alleles that are tracked; all
 that's required is that reproductive success be random (with
 replacement) in discrete generations with fixed population size.
+
+One good introduction to concepts underlying the coalescent and coalescent simulations is:
+
+  "Genealogical trees, coalescent theory and the analysis of genetic polymorphisms"<br/>
+  Rosenberg, Noah A. and Nordborg, Magnus<br/>
+  *Nature Reviews Genetics*, May 2002, v. 3 no. 5, pp. 380-390.<br/>
+
 
 ##### Possible future additions:
 
