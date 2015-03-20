@@ -23,10 +23,10 @@
 <script>
 
 var width = 800,
-    height = 500;
+    height = 600;
 
 var popsize = 20;
-var maxgens = 25;
+var maxgens = 27;
 //var delay = 750;
 var delay = 100;
 //delay = 0; // DEBUG
@@ -35,7 +35,7 @@ var firsttick = true;
 
 var tree = d3.layout.tree()
     .size([width - 20, height - 20])
-    //.separation(function (a, b) {return a.parent == b.parent ? 1 : 2;}) // does this work??
+    .separation(function (a, b) {return a.parent == b.parent ? 7 : 8;}) // does this work??
     ;
 
 var root = {},
