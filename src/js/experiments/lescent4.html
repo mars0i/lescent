@@ -43,8 +43,8 @@ var svg = d3.select("body").insert("svg", "#controls")
     .append("g")
     .attr("transform", "translate(10,10)");
 
-var node = svg.selectAll(".node"),
-    link = svg.selectAll(".link");
+var node0 = svg.selectAll(".node"),
+    link0 = svg.selectAll(".link");
 
 createTreeData();
 createSVG();
@@ -54,8 +54,7 @@ createSVG();
 function createTreeData () {
     tree = d3.layout.tree()
         .size([width - 20, height - 20])
-        .separation(function (a, b) {return a.parent == b.parent ? 7 : 8;}) // does this work??
-        ;
+        .separation(function (a, b) {return a.parent == b.parent ? 7 : 8;}); // does this work??
 
     root = {};
     nodes = tree.nodes(root);
@@ -64,17 +63,10 @@ function createTreeData () {
     root.px = root.x;
     root.py = root.y;
 
-    console.log(nodes);
-
     for (j = 0; j <= maxgens; j++) {  // note include generation maxgens.  "generation 0" is just scaffolding, and not part of the model.
-        //var currgen = generation(j);
-        var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
-	var currgen = generation(gennum);
-	console.log("j = "+j+", gennum = "+gennum);
-	console.log(currgen);
-
-        //tree.nodes(root);
-        //tree.links(nodes);
+        tree.nodes(root);
+        tree.links(nodes);
+        var currgen = generation(j);
 
         // Randomly create exactly popsize children
         for (i = 0; i < popsize; i++) {
@@ -90,8 +82,8 @@ function createTreeData () {
 function createSVG() {
 
   // Recompute the layout and data join.
-  node = node.data(tree.nodes(root), function(d) { return d.id; });
-  link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
+  node = node0.data(tree.nodes(root), function(d) { return d.id; });
+  link = link0.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
 
   // Add entering nodes in the parent’s old position.
   node.enter()
@@ -106,6 +98,7 @@ function createSVG() {
   link.enter().insert("path", ".node")
       .attr("class", "link")
       .attr("d", function(d) {
+        console.log(d);
         var o = {x: d.source.px, y: d.source.py};
         return line({source: o, target: o});
       })
@@ -121,10 +114,10 @@ function createSVG() {
 	      return delay;
 	  }});
 
-  t.selectAll(".link")
+  svg.selectAll(".link")
       .attr("d", line);  // Note line() is a function defined above/below.
 
-  t.selectAll(".node")
+  svg.selectAll(".node")
       .attr("cx", function(d) { return d.px = d.x; })
       .attr("cy", function(d) { return d.py = d.y; });
 } // end of createSVG
@@ -197,9 +190,11 @@ function toggleExtinct () {
 function hideExtinct () {
     if (!ancdata)
         fillAncData();
+
     node.data(ancdata[0], function(d){return d.id;})
         .exit()
 	.attr("opacity", 0);
+
     link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
 	.attr("opacity", 0);
@@ -208,9 +203,11 @@ function hideExtinct () {
 function unhideExtinct () {
     if (!ancdata)
         fillAncData(); // should be redundant
+
     node.data(ancdata[0], function(d){return d.id;})
         .exit()
         .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
+
     link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
@@ -219,8 +216,11 @@ function unhideExtinct () {
 // Drop-in straight-line replacement for diagonal() based on
 // elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
 function line(d){
+    if (d.source.x === undefined || d.source.y === undefined || d.target.x === undefined || d.target.y === undefined) {console.log(this); console.log(d); throw "Whaa...?";}
+
     var linemaker = d3.svg.line().x( function(point) { return point.lx; })
                                  .y( function(point) { return point.ly; });
+
     return linemaker([{lx: d.source.x, ly: d.source.y},
                       {lx: d.target.x, ly: d.target.y}]);
 }
