@@ -20,7 +20,7 @@
 <button id="create" onclick="makeGenealogy()">new genealogy</button>
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
-<button id="print" onclick="printGenealogy()">print</button>
+<button id="nocontrols" onclick="removeControls()">remove buttons for printing</button>
 </div>
 
 <script>
@@ -209,10 +209,8 @@ function makeGenealogy () {
     }
 }
 
-function printGenealogy () {
-    d3.select("#controls").style("visibility", "hidden");
-    window.print();
-    d3.select("#controls").style("visibility", "visible");
+function removeControls () {
+    d3.select("#controls").remove();
 }
 
 </script>
