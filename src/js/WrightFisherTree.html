@@ -245,12 +245,6 @@ function makeGenealogy () {
     }
 }
 
-function setPopsize () {
-    popsize = this.value;
-    console.log(this.selectedIndex);
-    console.log(this.value);
-}
-
 function printGenealogy () {
     d3.select("#controls").style("visibility", "hidden");
     window.print();
