@@ -20,6 +20,8 @@
 <button id="create" onclick="makeGenealogy()">new genealogy</button>
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
+population size: <select id="popsize"></select>
+generations: <select id="generations"></select>
 <button id="print" onclick="printGenealogy()">print</button>
 </div>
 
@@ -30,18 +32,49 @@
 
 var width  = 800, height = 600;
 
-var popsize = 20;
-var maxgens = 25;
+var popsize = 20;     // default value--might be changed by user.
+var maxpopsize = 40;
+var generations = 25;
+var mingenerations = 3;
+var maxgenerations = 40;
 
 var toggleMarked, toggleExtinct;
 
-d3.select("#controls").style({"width":(width+"px"), "text-align":"center"});
-
+//// set up SVG area
 var svg = d3.select("body").insert("svg", "#controls")
     .attr("width", width)
     .attr("height", height)
     .append("g")
     .attr("transform", "translate(10,10)");
+
+//// set up controls div
+d3.select("#controls").style({"width":(width+"px"), "text-align":"center"});
+
+///// set up population size dropdown
+var popsizeControl = d3.select("#popsize");
+
+popsizeControl.selectAll("option")    // add numeric options
+    .data(d3.range(1,maxpopsize+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+popsizeControl
+    .property("value", popsize)  // default value
+    .on("change", function (d) {popsize = this.value;}); // action
+
+///// set up generations dropdown
+var generationsControl = d3.select("#generations");
+
+generationsControl.selectAll("option")    // add numeric options
+    .data(d3.range(mingenerations, maxgenerations+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+generationsControl
+    .property("value", generations)  // default value
+    .on("change", function (d) {generations = this.value;}); // action
 
 makeGenealogy();
 
@@ -87,7 +120,7 @@ function makeGenealogy () {
         link = svg.selectAll(".link");
 
     // build the genealogy--both data and svg, leaving svg objects invisible:
-    for (k = 0; k < maxgens; k++) {update();}
+    for (k = 0; k < generations; k++) {update();}
     // Then reveal the svg objects:
     svg.selectAll(".node").attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
     svg.selectAll(".link").attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
@@ -210,6 +243,12 @@ function makeGenealogy () {
         return linemaker([{lx: d.source.x, ly: d.source.y},
                           {lx: d.target.x, ly: d.target.y}]);
     }
+}
+
+function setPopsize () {
+    popsize = this.value;
+    console.log(this.selectedIndex);
+    console.log(this.value);
 }
 
 function printGenealogy () {
