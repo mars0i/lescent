@@ -18,20 +18,26 @@ comparing the genealogy of the current generation with all lineages
 starting from the same population helps one to understand the utility of
 coalescent simulations.
 
-Buttons at the bottom allow:
+Controls at the bottom allow:
 
 * Generating a new genealogy.
 * Highlighting those lineages that still are still present in the
   last generation.  (These are the ones that a coalescent simulation
   could generate.)
 * Removing all other lineages.
+* Setting population size and number of generations.
 * Printing the page (without the buttons).
+
+Tip: In OS X, Safari is a good option for generating a PDF via the
+print dialog, because it doesn't add a header and footer giving
+information about the filename, etc.
 
 Note that "Wright-Fisher model" in this context doesn't imply that
 there are multiple alleles that are tracked; all that's required for
 generating a genealogical tree using a Wright-Fisher model is that
 reproductive success be random (with replacement) in discrete
 generations with fixed population size.
+
 
 One good introduction to concepts underlying the coalescent process and
 coalescent simulations is:
@@ -43,7 +49,7 @@ coalescent simulations is:
 ### Possible future additions:
 
 * Cause tree to appear to extend sequentially from the top of the window,
-rather than seeming to rise up from the bottom as it's done now.
+rather just appearing at once.
 
 * Allow user to mark individuals and the display their most recent
 common ancestor.
