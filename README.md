@@ -5,7 +5,7 @@ i.e. programs that may be useful for teaching coalescent concepts.
 Live demo: http://bl.ocks.org/mars0i/e08f6e578076560bf3bf<br/>
 (It may be slightly different from what's here.)
 
-This project began as modifications of a small program by Mike Bostock:
+This project began as modifications of an example by Mike Bostock:
 https://gist.github.com/mbostock/999346 .
 
 All new text and software is copyright 2015 by Marshall Abrams. The
