@@ -9,7 +9,7 @@ software is distributed under the Gnu General Public License version
 This project began as modifications of a small program by Mike Bostock:
 https://gist.github.com/mbostock/999346 .
 
-### What WrightFisherTree.html does:
+### What it does:
 
 Generates a random genealogy, and then allows you to highlight the
 ancestors of everyone in the last generation.  The program is a forward
@@ -38,7 +38,6 @@ generating a genealogical tree using a Wright-Fisher model is that
 reproductive success be random (with replacement) in discrete
 generations with fixed population size.
 
-
 One good introduction to concepts underlying the coalescent process and
 coalescent simulations is:
 
@@ -50,17 +49,14 @@ coalescent simulations is:
 
 * Add random mutations.
 
+* Allow user to mark individuals in last generation and the display
+their most recent common ancestor.
+
+* Allow reformatting the non-extinct trees using the d3 tree layout when
+  the extinct branches are hidden.
+
 * Cause tree to appear to extend sequentially from the top of the window,
 rather just appearing at once.
-
-* Allow user to mark individuals and the display their most recent
-common ancestor.
-
-* Place mutations on individuals and then track the mutations through
-the tree.
-
-* Generate trees using a true coalescent simulation, i.e. a backward
-simulation.
 
 * Fix small bug that causes top of trees to be in middle of page when
   number of generations is small.  (This is due to the fact that there's
@@ -70,3 +66,6 @@ simulation.
 
 * Possibly rearrange main tree generation code so that it's not adjusting the
   layout repeatedly as the data is being generated.
+
+* Generate trees using a true coalescent simulation, i.e. a backward
+simulation.
