@@ -48,27 +48,4 @@ coalescent simulations is:
   Rosenberg, Noah A. and Nordborg, Magnus<br/>
   *Nature Reviews Genetics*, May 2002, v. 3 no. 5, pp. 380-390.<br/>
 
-### Possible future changes/additions:
-
-* Add random mutations.
-
-* Allow user to mark individuals in last generation and the display
-their most recent common ancestor.
-
-* Allow reformatting the non-extinct trees using the d3 tree layout when
-  the extinct branches are hidden.
-
-* Cause tree to appear to extend sequentially from the top of the window,
-rather just appearing at once.
-
-* Fix small bug that causes top of trees to be in middle of page when
-  number of generations is small.  (This is due to the fact that there's
-  actually a hidden one-individual "generation" that's needed by d3's
-  tree layout function.  To fix it I can special-case the y-coordinates
-  of the first proper generation.)
-
-* Possibly rearrange main tree generation code so that it's not adjusting the
-  layout repeatedly as the data is being generated.
-
-* Generate trees using a true coalescent simulation, i.e. a backward
-simulation.
+See Issues for possible future changes/additions.
