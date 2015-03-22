@@ -3,7 +3,7 @@ Diagrams for lessons on the coalescent<br/>
 i.e. programs that may be useful for teaching coalescent concepts.
 
 Live demo: http://bl.ocks.org/mars0i/e08f6e578076560bf3bf<br/>
-(possibly slightly different from what's here).
+(It may be slightly different from what's here.)
 
 This project began as modifications of a small program by Mike Bostock:
 https://gist.github.com/mbostock/999346 .
