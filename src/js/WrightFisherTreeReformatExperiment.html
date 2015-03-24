@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.node {
+  stroke: #fff;
+  stroke-width: 2px;
+}
+
+.link {
+  fill: none;
+  stroke: #000;
+}
+
+</style>
+
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="~/d3/d3.v3.js"></script> -->
+<div id="controls">
+<button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
+<button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
+<button id="format" onclick="toggleNormalize()">reformat ancestors</button>
+<button id="create" onclick="makeGenealogy()">new genealogy:</button>
+population size: <select id="popsize"></select>
+generations: <select id="generations"></select>
+<button id="print" onclick="printGenealogy()">print</button>
+</div>
+
+<script>
+// A bit inelegant.  I started by hacking 
+// http://bl.ocks.org/mbostock/999346 and haven't yet
+// gotten a more direct method to work.
+
+var width  = 800, height = 600;
+
+var popsize = 20;     // default value--might be changed by user.
+var maxpopsize = 40;
+var generations = 25;
+var mingenerations = 3;
+var maxgenerations = 40;
+
+var toggleMarked, toggleExtinct, toggleNormalize;
+
+//// set up SVG area
+var svg = d3.select("body").insert("svg", "#controls")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", "translate(10,10)");
+
+//// set up controls div
+d3.select("#controls").style({"width":(width+"px"), "text-align":"center"});
+
+///// set up population size dropdown
+var popsizeControl = d3.select("#popsize");
+
+popsizeControl.selectAll("option")    // add numeric options
+    .data(d3.range(1,maxpopsize+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+popsizeControl
+    .property("value", popsize)  // default value
+    .on("change", function (d) {popsize = this.value;}); // action
+
+///// set up generations dropdown
+var generationsControl = d3.select("#generations");
+
+generationsControl.selectAll("option")    // add numeric options
+    .data(d3.range(mingenerations, maxgenerations+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+generationsControl
+    .property("value", generations)  // default value
+    .on("change", function (d) {generations = this.value;}); // action
+
+makeGenealogy();
+
+///// End of top-level "working code".
+////////////////////////////////////////////////
+
+function makeGenealogy () {
+    var ancestorsMarked = false;
+    toggleMarked = function () {
+        if (ancestorsMarked) {
+            ancestorsMarked = false;
+            unmarkAncestors();
+        } else {
+            ancestorsMarked = true;
+            markAncestors();
+        }
+    }
+
+    var extinctHidden = false;
+    toggleExtinct = function () {
+        if (extinctHidden) {
+            extinctHidden = false;
+            unhideExtinct();
+        } else {
+            extinctHidden = true;
+            hideExtinct();
+        }
+    }
+
+    toggleNormalize = function () {
+        if (extinctHidden) {
+	    normalizeAncestors();
+	}
+    }
+
+    svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
+
+    var tree = d3.layout.tree()
+        .size([width - 20, height - 20])
+        .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
+
+    // initialize genealogy data structures
+    var root = {}, nodes = tree.nodes(root);
+    root.parent = root;
+    root.px = root.x;
+    root.py = root.y;
+
+    var node = svg.selectAll(".node"),
+        link = svg.selectAll(".link");
+
+    // build the genealogy--both data and svg, leaving svg objects invisible:
+    for (k = 0; k < generations; k++) {update();}
+    // Then reveal the svg objects:
+    svg.selectAll(".node").attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
+    svg.selectAll(".link").attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+
+    ///// End of "working code" in the makeGenealogy() function.
+    ///// The rest of this contains only function definitions and a few variable
+    ///// defs used in the functions below.
+    /////////////////////////////////////////////////////////////////////
+
+    function update() {
+        var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
+        var currgen = generation(gennum);
+
+        // Randomly create exactly popsize children
+        for (i=0; i < popsize; i++) {
+            var n = {id: nodes.length},
+                p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,nodes.length).
+            if (p.children) p.children.push(n); else p.children = [n];
+            nodes.push(n);
+        }
+
+        // Recompute the layout and data join.
+        node = node.data(tree.nodes(root), function(d) { return d.id; });
+        link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
+
+        // Add entering nodes in the parent’s old position.
+        node.enter()
+            .append("circle")
+            .attr("opacity", 0)
+            .attr("class", "node")
+            .attr("r", 4)
+            .attr("cx", function(d) { return d.parent.px; })
+            .attr("cy", function(d) { return d.parent.py; });
+
+        // Add entering links in the parent’s old position.
+        link.enter().insert("path", ".node")
+            .attr("class", "link")
+            .attr("d", function(d) {
+              var o = {x: d.source.px, y: d.source.py};
+              return line({source: o, target: o});
+            })
+            .attr("opacity", 0);
+
+        svg.selectAll(".link")
+            .attr("d", line);  // Note line() is a function defined above/below.
+
+        svg.selectAll(".node")
+            .attr("cx", function(d) { return d.px = d.x; })
+            .attr("cy", function(d) { return d.py = d.y; });
+    }
+
+    function generation (n) {
+        return nodes.filter(function (d) {return d.depth === n;});
+    }
+
+    function ancestors (currnodes, stop, accnodes, acclinks) {
+       var newlinks = link.data().filter(function (d) {return currnodes.indexOf(d.target) !== -1;}); // links whose target node can be found in nods.
+       var newnodes = newlinks.map(function (d) {return d.source;});
+
+       if (stop(newnodes)) {
+           return [accnodes.concat(newnodes), acclinks.concat(newlinks)];
+       } else {
+           return ancestors(newnodes, stop, accnodes.concat(newnodes), acclinks.concat(newlinks));
+       }
+    }
+
+    var ancdata = undefined;
+    function fillAncData (){
+      var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
+      var currgen = generation(gennum);
+      ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+    }
+
+    function markAncestors () {
+        if (!ancdata)
+            fillAncData();
+        node.data(ancdata[0], function(d){return d.id;})
+            .style("fill", "red");
+        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+            .style("stroke-width", "2")
+            .style("stroke", "red");
+    }
+
+    function unmarkAncestors () {
+        if (!ancdata)
+            fillAncData();
+        node.data(ancdata[0], function(d){return d.id;})
+            .style("fill", "black");
+        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+            .style("stroke-width", "1")
+            .style("stroke", "black");
+    }
+
+    function hideExtinct () {
+        if (!ancdata)
+            fillAncData();
+        node.data(ancdata[0], function(d){return d.id;})
+            .exit()
+    	.attr("opacity", 0);
+        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+            .exit()
+    	.attr("opacity", 0);
+    }
+
+    function unhideExtinct () {
+        if (!ancdata)
+            fillAncData(); // should be redundant
+        node.data(ancdata[0], function(d){return d.id;})
+            .exit()
+            .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
+        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+            .exit()
+            .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+    }
+
+    function normalizeAncestors () {
+        if (!ancdata)
+            fillAncData();
+	
+	//console.log(ancdata);
+	//console.log(ancdata[0].filter(function (d) {return d.depth === 1;}));
+
+        var ancroot = {}
+	var ancnodes = tree.nodes(ancroot);
+        ancroot.parent = ancroot;
+        ancroot.px = ancroot.x;
+        ancroot.py = ancroot.y;
+
+        svg.selectAll(".node")
+	   .data(ancnodes, function(d) { return d.id; })
+	   .enter()
+	   .each(function(d){console.log(d);})
+           //.attr("cx", function(d) { return d.px = d.x; })
+           //.attr("cy", function(d) { return d.py = d.y; })
+	   ;
+
+    }
+
+    // Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
+    function line(d){
+        var linemaker = d3.svg.line().x( function(point) { return point.lx; })
+                                     .y( function(point) { return point.ly; });
+        return linemaker([{lx: d.source.x, ly: d.source.y},
+                          {lx: d.target.x, ly: d.target.y}]);
+    }
+}
+
+function printGenealogy () {
+    d3.select("#controls").style("visibility", "hidden");
+    window.print();
+    d3.select("#controls").style("visibility", "visible");
+}
+
+</script>
