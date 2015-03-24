@@ -31,6 +31,9 @@ generations: <select id="generations"></select>
 // http://bl.ocks.org/mbostock/999346 and haven't yet
 // gotten a more direct method to work.
 
+// NOTE: dnodes refers to the *data* tree nodes, i.e. individuals in generations (except for the hidden, root node). (What Bostock calls "nodes".)
+//       snodes refers to the *svg* tree nodes (g's containing circles).  (What Bostock calls "node".)
+
 var width  = 800, height = 600;
 
 var popsize = 20;     // default value--might be changed by user.
@@ -116,12 +119,12 @@ function makeGenealogy () {
         .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 
     // initialize genealogy data structures
-    var root = {}, nodes = tree.nodes(root);
+    var root = {}, dnodes = tree.nodes(root);
     root.parent = root;
     root.px = root.x;
     root.py = root.y;
 
-    var node = svg.selectAll(".node"),
+    var snodes = svg.selectAll(".node"),
         link = svg.selectAll(".link");
 
     // build the genealogy in a loop--both data and svg, but initially leaving svg objects invisible:
@@ -137,23 +140,23 @@ function makeGenealogy () {
     /////////////////////////////////////////////////////////////////////
 
     function update() {
-        var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
+        var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
         var currgen = generation(gennum);
 
         // Randomly create exactly popsize children
         for (i=0; i < popsize; i++) {
-            var n = {id: nodes.length},
-                p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,nodes.length).
+            var n = {id: dnodes.length},
+                p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,dnodes.length).
             if (p.children) p.children.push(n); else p.children = [n];
-            nodes.push(n);
+            dnodes.push(n);
         }
 
         // Recompute the layout and data join.
-        node = node.data(tree.nodes(root), function(d) { return d.id; });
-        link = link.data(tree.links(nodes), function(d) { return d.source.id + "-" + d.target.id; });
+        snodes = snodes.data(tree.nodes(root), function(d) { return d.id; });
+        link = link.data(tree.links(dnodes), function(d) { return d.source.id + "-" + d.target.id; });
 
         // Add entering nodes in the parent’s old position.
-        node.enter()
+        snodes.enter()
             .append("circle")
             .attr("opacity", 0)
             .attr("class", "node")
@@ -179,7 +182,7 @@ function makeGenealogy () {
     }
 
     function generation (n) {
-        return nodes.filter(function (d) {return d.depth === n;});
+        return dnodes.filter(function (d) {return d.depth === n;});
     }
 
     function ancestors (currnodes, stop, accnodes, acclinks) {
@@ -195,7 +198,7 @@ function makeGenealogy () {
 
     var ancdata = undefined;
     function fillAncData (){
-      var gennum = Math.max.apply(Math, nodes.map(function(d){return d.depth;}));
+      var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
       var currgen = generation(gennum);
       ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
     }
@@ -203,7 +206,7 @@ function makeGenealogy () {
     function markAncestors () {
         if (!ancdata)
             fillAncData();
-        node.data(ancdata[0], function(d){return d.id;})
+        snodes.data(ancdata[0], function(d){return d.id;})
             .style("fill", "red");
         link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
             .style("stroke-width", "2")
@@ -213,7 +216,7 @@ function makeGenealogy () {
     function unmarkAncestors () {
         if (!ancdata)
             fillAncData();
-        node.data(ancdata[0], function(d){return d.id;})
+        snodes.data(ancdata[0], function(d){return d.id;})
             .style("fill", "black");
         link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
             .style("stroke-width", "1")
@@ -223,7 +226,7 @@ function makeGenealogy () {
     function hideExtinct () {
         if (!ancdata)
             fillAncData();
-        node.data(ancdata[0], function(d){return d.id;})
+        snodes.data(ancdata[0], function(d){return d.id;})
             .exit()
     	.attr("opacity", 0);
         link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
@@ -234,7 +237,7 @@ function makeGenealogy () {
     function unhideExtinct () {
         if (!ancdata)
             fillAncData(); // should be redundant
-        node.data(ancdata[0], function(d){return d.id;})
+        snodes.data(ancdata[0], function(d){return d.id;})
             .exit()
             .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
         link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
