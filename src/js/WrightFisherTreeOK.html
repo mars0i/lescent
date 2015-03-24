@@ -31,6 +31,9 @@ generations: <select id="generations"></select>
 // http://bl.ocks.org/mbostock/999346 and haven't yet
 // gotten a more direct method to work.
 
+// NOTE: dnodes refers to the *data* tree nodes, i.e. individuals in generations (except for the hidden, root node). (What Bostock calls "nodes".)
+//       snodes refers to the *svg* tree nodes (g's containing circles).  (What Bostock calls "node".)
+
 var width  = 800, height = 600;
 
 var popsize = 20;     // default value--might be changed by user.
@@ -40,11 +43,6 @@ var mingenerations = 3;
 var maxgenerations = 40;
 
 var toggleMarked, toggleExtinct;
-var ancdata, ancestorsMarked, extinctHidden;
-
-// NOTE: dnodes refers to the *data* tree nodes, i.e. individuals in generations (except for the hidden, root node). (What Bostock calls "nodes".)
-//       snodes refers to the *svg* tree nodes (g's containing circles).  (What Bostock calls "node".)
-var dnodes, snodes;
 
 //// set up SVG area
 var svg = d3.select("body").insert("svg", "#controls")
@@ -88,12 +86,31 @@ makeGenealogy();
 ////////////////////////////////////////////////
 
 function makeGenealogy () {
+    // exported functions first. internal functions at end.
+    var ancestorsMarked = false;
+    toggleMarked = function () {
+        if (ancestorsMarked) {
+            ancestorsMarked = false;
+            unmarkAncestors();
+        } else {
+            ancestorsMarked = true;
+            markAncestors();
+        }
+    }
+
+    var extinctHidden = false;
+    toggleExtinct = function () {
+        if (extinctHidden) {
+            extinctHidden = false;
+            unhideExtinct();
+        } else {
+            extinctHidden = true;
+            hideExtinct();
+        }
+    }
 
     /////////////////////////////////////////////////////////////////////
     // Top-level "working code within the update function" begins.  Outside of this region, only function defs (which of course do a lot of work).
-    ancdata = undefined;
-    ancestorsMarked = false;
-    extinctHidden = false;
 
     svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
 
@@ -102,14 +119,13 @@ function makeGenealogy () {
         .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 
     // initialize genealogy data structures
-    var root = {};
-    dnodes = tree.nodes(root);
+    var root = {}, dnodes = tree.nodes(root);
     root.parent = root;
     root.px = root.x;
     root.py = root.y;
 
-    snodes = svg.selectAll(".node"),
-    link = svg.selectAll(".link");
+    var snodes = svg.selectAll(".node"),
+        link = svg.selectAll(".link");
 
     // build the genealogy in a loop--both data and svg, but initially leaving svg objects invisible:
     for (k = 0; k < generations; k++) {update();}
@@ -129,7 +145,6 @@ function makeGenealogy () {
 
         // Randomly create exactly popsize children
         for (i=0; i < popsize; i++) {
-	  console.log(dnodes.length);
             var n = {id: dnodes.length},
                 p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,dnodes.length).
             if (p.children) p.children.push(n); else p.children = [n];
@@ -165,7 +180,6 @@ function makeGenealogy () {
             .attr("cx", function(d) { return d.px = d.x; })
             .attr("cy", function(d) { return d.py = d.y; });
     }
-}
 
     function generation (n) {
         return dnodes.filter(function (d) {return d.depth === n;});
@@ -182,6 +196,7 @@ function makeGenealogy () {
        }
     }
 
+    var ancdata = undefined;
     function fillAncData (){
       var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
       var currgen = generation(gennum);
@@ -237,27 +252,7 @@ function makeGenealogy () {
         return linemaker([{lx: d.source.x, ly: d.source.y},
                           {lx: d.target.x, ly: d.target.y}]);
     }
-
-    toggleMarked = function () {
-        if (ancestorsMarked) {
-            ancestorsMarked = false;
-            unmarkAncestors();
-        } else {
-            ancestorsMarked = true;
-            markAncestors();
-        }
-    }
-
-    toggleExtinct = function () {
-        if (extinctHidden) {
-            extinctHidden = false;
-            unhideExtinct();
-        } else {
-            extinctHidden = true;
-            hideExtinct();
-        }
-    }
-
+}
 
 function printGenealogy () {
     d3.select("#controls").style("visibility", "hidden");
