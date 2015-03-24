@@ -79,10 +79,11 @@ generationsControl
 
 makeGenealogy();
 
-///// End of top-level "working code".
+///// End of top-level "working code" in this file.
 ////////////////////////////////////////////////
 
 function makeGenealogy () {
+    // exported functions first. internal functions at end.
     var ancestorsMarked = false;
     toggleMarked = function () {
         if (ancestorsMarked) {
@@ -105,6 +106,9 @@ function makeGenealogy () {
         }
     }
 
+    /////////////////////////////////////////////////////////////////////
+    // Top-level "working code within the update function" begins.  Outside of this region, only function defs (which of course do a lot of work).
+
     svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
 
     var tree = d3.layout.tree()
@@ -120,9 +124,10 @@ function makeGenealogy () {
     var node = svg.selectAll(".node"),
         link = svg.selectAll(".link");
 
-    // build the genealogy--both data and svg, leaving svg objects invisible:
+    // build the genealogy in a loop--both data and svg, but initially leaving svg objects invisible:
     for (k = 0; k < generations; k++) {update();}
-    // Then reveal the svg objects:
+
+    // Now reveal the svg objects:
     svg.selectAll(".node").attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
     svg.selectAll(".link").attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 
