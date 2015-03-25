@@ -86,13 +86,19 @@ makeGenealogy();
 ///// End of top-level "working code" in this file.
 ////////////////////////////////////////////////
 
-function makeRootTree (tree) {
+function addRoot (tree) {
     var root = {id:0};
     var dnodes = tree.nodes(root);
     root.parent = root;
     root.px = root.x;
     root.py = root.y;
     return dnodes;
+}
+
+function makeTree () {
+    return tree = d3.layout.tree()
+        .size([width - 20, height - 20])
+        .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 }
 
 function makeGenealogy () {
@@ -104,9 +110,7 @@ function makeGenealogy () {
 
     svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
 
-    var tree = d3.layout.tree()
-        .size([width - 20, height - 20])
-        .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
+    var tree = makeTree();
 
     // initialize genealogy data structures
     //var root = {id:0};
@@ -114,7 +118,7 @@ function makeGenealogy () {
     //root.parent = root;
     //root.px = root.x;
     //root.py = root.y;
-    dnodes = makeRootTree(tree);
+    dnodes = addRoot(tree);
     root = dnodes[0];
 
     snodes = svg.selectAll(".node"),
@@ -262,17 +266,26 @@ function unhideExtinct () {
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
 
-function yo () {
+function yoAttemptToReformatAncestors () {
     console.log(dnodes);
     console.log(dnodes.length);
     if (!ancdata)
         fillAncData();
-    console.log(ancdata[0]);
-    console.log(ancdata[0].length);
-    var gen1 = ancdata[0].filter(function (d) {return d.depth === 1;});
+    
+    ancnodes = ancdata[0];
+
+    console.log(ancnodes);
+    console.log(ancnodes.length);
+    var gen1 = ancnodes.filter(function (d) {return d.depth === 1;});
     console.log(gen1);
-    root.children = gen1;
-    console.log(dnodes);
+    var newtree = makeTree();
+    var newdnodes = addRoot(newtree);
+    var newroot = newdnodes[0];
+    newroot.children = gen1;
+    newdnodes = newdnodes.concat(ancnodes);
+    //newtree.nodes(ancnodes);
+    newtree.links(newdnodes);
+    displayGenealogy(newroot, newtree);
 }
 
 // Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
