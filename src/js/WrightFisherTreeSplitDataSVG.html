@@ -102,18 +102,21 @@ function makeGenealogy () {
         .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 
     // initialize genealogy data structures
-    var root = {};
+    var root = {id:0};
     dnodes = tree.nodes(root);
     root.parent = root;
     root.px = root.x;
     root.py = root.y;
 
     snodes = svg.selectAll(".node"),
-    link = svg.selectAll(".link");
+    slinks = svg.selectAll(".link");
 
-    // build the genealogy in a loop--both data and svg, but initially leaving svg objects invisible:
-    for (k = 0; k < generations; k++) {update();}
+    // build the genealogy data in a loop
+    for (k = 0; k < generations; k++) {
+        update();
+    }
 
+    // create the svg based on the data, initially invisible
     display();
 
     // Now reveal the svg objects:
@@ -146,125 +149,115 @@ function makeGenealogy () {
 
         // Recompute the layout and data join.
         snodes = snodes.data(tree.nodes(root), function(d) { return d.id; });
-        link = link.data(tree.links(dnodes), function(d) { return d.source.id + "-" + d.target.id; });
-
         // Add entering nodes in the parent’s old position.
         snodes.enter()
             .append("circle")
             .attr("opacity", 0)
             .attr("class", "node")
             .attr("r", 4)
-            .attr("cx", function(d) { return d.parent.px; })
-            .attr("cy", function(d) { return d.parent.py; });
+            .attr("cx", function(d) { return d.px = d.x; })  // note that in addition to placing the nodes
+            .attr("cy", function(d) { return d.py = d.y; }); // these modify data, assigning x to px, etc.
 
+        // Recompute the layout and data join.
+        slinks = slinks.data(tree.links(dnodes), function(d) { return d.source.id + "-" + d.target.id; });
         // Add entering links in the parent’s old position.
-        link.enter().insert("path", ".node")
+        slinks.enter().insert("path", ".node")
             .attr("class", "link")
-            .attr("d", function(d) {
-              var o = {x: d.source.px, y: d.source.py};
-              return line({source: o, target: o});
-            })
+            .attr("d", line)  // Note line() is a function defined above/below.
             .attr("opacity", 0);
-
-        svg.selectAll(".link")
-            .attr("d", line);  // Note line() is a function defined above/below.
-
-        svg.selectAll(".node")
-            .attr("cx", function(d) { return d.px = d.x; })
-            .attr("cy", function(d) { return d.py = d.y; });
     }
 }
 
-    function generation (n) {
-        return dnodes.filter(function (d) {return d.depth === n;});
-    }
+function generation (n) {
+    return dnodes.filter(function (d) {return d.depth === n;});
+}
 
-    function ancestors (currnodes, stop, accnodes, acclinks) {
-       var newlinks = link.data().filter(function (d) {return currnodes.indexOf(d.target) !== -1;}); // links whose target node can be found in nods.
-       var newnodes = newlinks.map(function (d) {return d.source;});
+function ancestors (currnodes, stop, accnodes, acclinks) {
+   var newlinks = slinks.data().filter(function (d) {return currnodes.indexOf(d.target) !== -1;}); // links whose target node can be found in nods.
+   var newnodes = newlinks.map(function (d) {return d.source;});
 
-       if (stop(newnodes)) {
-           return [accnodes.concat(newnodes), acclinks.concat(newlinks)];
-       } else {
-           return ancestors(newnodes, stop, accnodes.concat(newnodes), acclinks.concat(newlinks));
-       }
-    }
+   if (stop(newnodes)) {
+       return [accnodes.concat(newnodes), acclinks.concat(newlinks)];
+   } else {
+       return ancestors(newnodes, stop, accnodes.concat(newnodes), acclinks.concat(newlinks));
+   }
+}
 
-    function fillAncData (){
-      var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
-      var currgen = generation(gennum);
-      ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
-    }
+function fillAncData (){
+  var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
+  var currgen = generation(gennum);
+  ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+}
 
-    function markAncestors () {
-        if (!ancdata)
-            fillAncData();
-        snodes.data(ancdata[0], function(d){return d.id;})
-            .style("fill", "red");
-        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
-            .style("stroke-width", "2")
-            .style("stroke", "red");
-    }
+function markAncestors () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata[0], function(d){return d.id;})
+        .style("fill", "red");
+    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+        .style("stroke-width", "2")
+        .style("stroke", "red");
+}
 
-    function unmarkAncestors () {
-        if (!ancdata)
-            fillAncData();
-        snodes.data(ancdata[0], function(d){return d.id;})
-            .style("fill", "black");
-        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
-            .style("stroke-width", "1")
-            .style("stroke", "black");
-    }
+function unmarkAncestors () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata[0], function(d){return d.id;})
+        .style("fill", "black");
+    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+        .style("stroke-width", "1")
+        .style("stroke", "black");
+}
 
-    function hideExtinct () {
-        if (!ancdata)
-            fillAncData();
-        snodes.data(ancdata[0], function(d){return d.id;})
-            .exit()
-    	.attr("opacity", 0);
-        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
-            .exit()
-    	.attr("opacity", 0);
-    }
+function hideExtinct () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata[0], function(d){return d.id;})
+        .exit()
+	.attr("opacity", 0);
+    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+        .exit()
+	.attr("opacity", 0);
+}
 
-    function unhideExtinct () {
-        if (!ancdata)
-            fillAncData(); // should be redundant
-        snodes.data(ancdata[0], function(d){return d.id;})
-            .exit()
-            .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
-        link.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
-            .exit()
-            .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
-    }
+function unhideExtinct () {
+    if (!ancdata)
+        fillAncData(); // should be redundant
+    snodes.data(ancdata[0], function(d){return d.id;})
+        .exit()
+        .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
+    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+        .exit()
+        .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+}
 
-    // Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
-    function line(d){
-        var linemaker = d3.svg.line().x( function(point) { return point.lx; })
-                                     .y( function(point) { return point.ly; });
-        return linemaker([{lx: d.source.x, ly: d.source.y},
-                          {lx: d.target.x, ly: d.target.y}]);
-    }
+// Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
+function line(d){
+    var linemaker = d3.svg.line().x( function(point) { return point.lx; })  // lx, ly are abitrary names
+                                 .y( function(point) { return point.ly; }); // that are used in next lines.
+    return linemaker([{lx: d.source.x, ly: d.source.y},
+                      {lx: d.target.x, ly: d.target.y}]);
+}
 
-    toggleMarked = function () {
-        if (ancestorsMarked) {
-            ancestorsMarked = false;
-            unmarkAncestors();
-        } else {
-            ancestorsMarked = true;
-            markAncestors();
-        }
+toggleMarked = function () {
+    if (ancestorsMarked) {
+        ancestorsMarked = false;
+        unmarkAncestors();
+    } else {
+        ancestorsMarked = true;
+        markAncestors();
     }
+}
 
-    toggleExtinct = function () {
-        if (extinctHidden) {
-            extinctHidden = false;
-            unhideExtinct();
-        } else {
-            extinctHidden = true;
-            hideExtinct();
-        }
+toggleExtinct = function () {
+    if (extinctHidden) {
+        extinctHidden = false;
+        unhideExtinct();
+    } else {
+        extinctHidden = true;
+        hideExtinct();
     }
+}
 
 
 function printGenealogy () {
