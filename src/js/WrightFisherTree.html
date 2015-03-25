@@ -101,7 +101,7 @@ function makeTree () {
         .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 }
 
-function makeGenealogy () {
+function makeGenealogy (removeExtinct) {  // TODO ARGUMENT may be temporary experiment
     /////////////////////////////////////////////////////////////////////
     // Top-level "working code within the makeGenerationData function" begins.  Outside of this region, only function defs (which of course do a lot of work).
     ancdata = undefined;
@@ -121,12 +121,15 @@ function makeGenealogy () {
     dnodes = addRoot(tree);
     root = dnodes[0];
 
-    snodes = svg.selectAll(".node"),
-    slinks = svg.selectAll(".link");
-
     // build the genealogy data in a loop
     for (k = 0; k < generations; k++) {
         makeGenerationData();
+    }
+
+    // TODO TEMPORARY experiment
+    if (removeExtinct) {
+        fillAncData(); // FAILS
+	dnodes = dnodes.filter(function (d) {return d.isAncestral;});
     }
 
     // create the svg based on the data
@@ -156,6 +159,9 @@ function makeGenealogy () {
 }
 
 function displayGenealogy(root, tree){
+    snodes = svg.selectAll(".node"),
+    slinks = svg.selectAll(".link");
+
     // Recompute the layout and data join:
     snodes = snodes.data(tree.nodes(root), function(d) { return d.id; }) // needed as separate step so toplevel snodes has correct value
 
@@ -202,6 +208,9 @@ function fillAncData (){
   var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
   var currgen = generation(gennum);
   ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+  ancdata[0].forEach(function (d) {d.isAncestral = true;});  // side-effects global data nodes
+  ancdata[1].forEach(function (d) {d.isAncestral = true;});  // side-effects global data links
+  root.isAncestral = true;                                   // side-effects global root
 }
 
 function toggleMarked () {
@@ -285,7 +294,7 @@ function yoAttemptToReformatAncestors () {
     newdnodes = newdnodes.concat(ancnodes);
     //newtree.nodes(ancnodes);
     newtree.links(newdnodes);
-    displayGenealogy(newroot, newtree);
+    //displayGenealogy(newroot, newtree);
 }
 
 // Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
