@@ -209,16 +209,6 @@ function markAncestors () {
         .style("stroke", "red");
 }
 
-function toggleExtinct () {
-    if (extinctHidden) {
-        extinctHidden = false;
-        unhideExtinct();
-    } else {
-        extinctHidden = true;
-        hideExtinct();
-    }
-}
-
 function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
@@ -227,6 +217,16 @@ function unmarkAncestors () {
     slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "1")
         .style("stroke", "black");
+}
+
+function toggleExtinct () {
+    if (extinctHidden) {
+        extinctHidden = false;
+        unhideExtinct();
+    } else {
+        extinctHidden = true;
+        hideExtinct();
+    }
 }
 
 function hideExtinct () {
