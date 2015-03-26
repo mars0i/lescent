@@ -41,7 +41,7 @@ var ancdata, ancestorsMarked, extinctHidden;
 
 // NOTE: dnodes refers to the *data* tree nodes, i.e. individuals in generations (except for the hidden, root node). (What Bostock calls "nodes".)
 //       snodes refers to the *svg* tree nodes (g's containing circles).  (What Bostock calls "node".)
-var dnodes, snodes;
+var dnodes, snodes, tree;
 
 //// set up SVG area
 var svg = d3.select("body").insert("svg", "#controls")
@@ -108,7 +108,7 @@ function makeGenealogy () {
     extinctHidden = false;
     svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
 
-    var tree = makeTree();
+    tree = makeTree();
 
     dnodes = addRoot(tree);
     root = dnodes[0];
