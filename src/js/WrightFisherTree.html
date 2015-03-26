@@ -191,19 +191,19 @@ function ancestors (currnodes, stop, accnodes, acclinks) {
    var newnodes = newlinks.map(function (d) {return d.source;});
 
    if (stop(newnodes)) {
-       return [accnodes.concat(newnodes), acclinks.concat(newlinks)];
+       return {"nodes":accnodes.concat(newnodes), "links":acclinks.concat(newlinks)};
    } else {
        return ancestors(newnodes, stop, accnodes.concat(newnodes), acclinks.concat(newlinks));
    }
 }
 
 function fillAncData (){
-  var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
-  var currgen = generation(gennum);
-  ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
-  ancdata[0].forEach(function (d) {d.isAncestral = true;});  // side-effects global data nodes
-  ancdata[1].forEach(function (d) {d.isAncestral = true;});  // side-effects global data links
-  root.isAncestral = true;                                   // side-effects global root
+    var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
+    var currgen = generation(gennum);
+    ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+    ancdata.nodes.forEach(function (d) {d.isAncestral = true;});  // side-effects global data nodes
+    ancdata.links.forEach(function (d) {d.isAncestral = true;});  // side-effects global data links
+    root.isAncestral = true;                                   // side-effects global root
 }
 
 function toggleMarked () {
@@ -219,9 +219,9 @@ function toggleMarked () {
 function markAncestors () {
     if (!ancdata)
         fillAncData();
-    snodes.data(ancdata[0], function(d){return d.id;})
+    snodes.data(ancdata.nodes, function(d){return d.id;})
         .style("fill", "red");
-    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "2")
         .style("stroke", "red");
 }
@@ -229,9 +229,9 @@ function markAncestors () {
 function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
-    snodes.data(ancdata[0], function(d){return d.id;})
+    snodes.data(ancdata.nodes, function(d){return d.id;})
         .style("fill", "black");
-    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "1")
         .style("stroke", "black");
 }
@@ -249,10 +249,10 @@ function toggleExtinct () {
 function hideExtinct () {
     if (!ancdata)
         fillAncData();
-    snodes.data(ancdata[0], function(d){return d.id;})
+    snodes.data(ancdata.nodes, function(d){return d.id;})
         .exit()
 	.attr("opacity", 0);
-    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .exit()
 	.attr("opacity", 0);
 }
@@ -260,10 +260,10 @@ function hideExtinct () {
 function unhideExtinct () {
     if (!ancdata)
         fillAncData(); // should be redundant
-    snodes.data(ancdata[0], function(d){return d.id;})
+    snodes.data(ancdata.nodes, function(d){return d.id;})
         .exit()
         .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
-    slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
