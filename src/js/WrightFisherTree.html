@@ -101,22 +101,15 @@ function makeTree () {
 }
 
 function makeGenealogy () {
-    /////////////////////////////////////////////////////////////////////
-    // Top-level "working code within the makeGenerationData function" begins.  Outside of this region, only function defs (which of course do a lot of work).
+
+    // clear out vars, svg for new genealogy
     ancdata = undefined;
     ancestorsMarked = false;
     extinctHidden = false;
-
     svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
 
     var tree = makeTree();
 
-    // initialize genealogy data structures
-    //var root = {id:0};
-    //dnodes = tree.nodes(root);
-    //root.parent = root;
-    //root.px = root.x;
-    //root.py = root.y;
     dnodes = addRoot(tree);
     root = dnodes[0];
 
