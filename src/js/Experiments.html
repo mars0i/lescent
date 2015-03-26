@@ -311,4 +311,16 @@ function printGenealogy () {
     d3.select("#controls").style("visibility", "visible");
 }
 
+function stripNonAncestral () {
+    root.children.forEach(stripNonAncestralAux);
+}
+
+function stripNonAncestralAux (d) {
+    if  (d.children && !d.isAncestral) {
+        d._children = d.children;
+        d._children.forEach(stripNonAncestralAux);
+        d.children = null;
+    }
+}
+
 </script>
