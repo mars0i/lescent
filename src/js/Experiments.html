@@ -80,6 +80,7 @@ generationsControl
     .on("change", function (d) {generations = this.value;}); // action
 
 makeGenealogy();
+
 //toggleMarked(); // for gist
 
 ///// End of top-level "working code" in this file.
@@ -100,7 +101,7 @@ function makeTree () {
         .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
 }
 
-function makeGenealogy () {
+function makeGenealogy (removeExtinct) {  // TODO ARGUMENT may be temporary experiment
     /////////////////////////////////////////////////////////////////////
     // Top-level "working code within the makeGenerationData function" begins.  Outside of this region, only function defs (which of course do a lot of work).
     ancdata = undefined;
@@ -123,6 +124,12 @@ function makeGenealogy () {
     // build the genealogy data in a loop
     for (k = 0; k < generations; k++) {
         makeGenerationData();
+    }
+
+    // TODO TEMPORARY experiment
+    if (removeExtinct) {
+        fillAncData(); // FAILS
+	dnodes = dnodes.filter(function (d) {return d.isAncestral;});
     }
 
     // create the svg based on the data
@@ -266,6 +273,28 @@ function unhideExtinct () {
     slinks.data(ancdata[1], function(d){return d.source.id + "-" + d.target.id;})
         .exit()
         .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+}
+
+function yoAttemptToReformatAncestors () {
+    console.log(dnodes);
+    console.log(dnodes.length);
+    if (!ancdata)
+        fillAncData();
+    
+    ancnodes = ancdata[0];
+
+    console.log(ancnodes);
+    console.log(ancnodes.length);
+    var gen1 = ancnodes.filter(function (d) {return d.depth === 1;});
+    console.log(gen1);
+    var newtree = makeTree();
+    var newdnodes = addRoot(newtree);
+    var newroot = newdnodes[0];
+    newroot.children = gen1;
+    newdnodes = newdnodes.concat(ancnodes);
+    //newtree.nodes(ancnodes);
+    newtree.links(newdnodes);
+    //displayGenealogy(newroot, newtree);
 }
 
 // Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
