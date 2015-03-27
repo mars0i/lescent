@@ -3,8 +3,8 @@
 <style>
 
 .node {
-  stroke: #fff;
-  stroke-width: 2px;
+  stroke: #000;
+  stroke-width: 1px;
 }
 
 .link {
@@ -20,7 +20,7 @@
 <div id="controls">
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
-<button id="mutate" onclick="mutate()">add mutations</button>
+<button id="mutate" onclick="mutate()">add mutations</button><br/>
 <button id="create" onclick="makeGenealogy()">new genealogy:</button>
 population size: <select id="popsize"></select>
 generations: <select id="generations"></select>
@@ -48,10 +48,16 @@ var ancdata, ancestorsMarked, extinctHidden;
 var dnodes, snodes, tree;
 
 //// set up SVG area
-var svg = d3.select("body").insert("svg", "#controls")
+var initsvg = d3.select("body").insert("svg", "#controls")
     .attr("width", width)
-    .attr("height", height)
-    .append("g")
+    .attr("height", height);
+
+initsvg.append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", "#909090");
+
+var svg = initsvg.append("g")
     .attr("transform", "translate(10,10)");
 
 //// set up controls div
@@ -158,6 +164,7 @@ function displayGenealogy(root, tree){
     snodes.enter()
         .append("circle")
         .attr("class", "node")
+	.style("fill", "white")
         .attr("r", 4)
         .attr("cx", function(d) { return d.px = d.x; })  // Note that in addition to placing the nodes, these modify data,
         .attr("cy", function(d) { return d.py = d.y; })  // assigning x to px, etc. This must happen before call to line() below.
@@ -227,7 +234,7 @@ function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .style("fill", "black");
+        .style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", "1")
         .style("stroke", "black");
@@ -273,18 +280,28 @@ function line(d){
                       {lx: d.target.x, ly: d.target.y}]);
 }
 
-// inefficient ...
+// inefficient e.g. propagates mutations through the full lineage, and then overwrites them with later mutations.
 function mutate () {
-    var mutation = 0;
+
+    dnodes.forEach(function (d) {d.mutation = false;}); // clear out old effects
+    snodes.style("fill", "white");
+    slinks.style("stroke", "black");
+
+    // first add mutations to the data nodes:
+    var mutation = 0; // id of mutation for a simple infinite-alleles model
+    // give every indiv the same chance of mutating, and propagate the mutation if so.
+    // (we could do the first step separately in a forEach over all indivs.)
     for (i = 1; i <= generations; i++) {
         dgen = generation(i);
-        dgen.forEach(function (d) { // TODO This is not the right distribution.  It should be a Poisson process on branch lengths.
+        dgen.forEach(function (d) {
             if (Math.random() < mutationRate) {
                 d.mutation = mutation++;
-		propagateMutation(d);
+		propagateMutation(d);  // any mutation in a descendant will override some of these effects
             }
         });
     }
+
+    // then show the mutations in the svg objects:
 
     snodes.data(dnodes.filter(function (d) {return d.mutation;}), function (d) {return d.id;})
         .style("fill", function (d) {return mutationColors(d.mutation % numMutationColors);});
