@@ -20,6 +20,7 @@
 <div id="controls">
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
+<button id="mutate" onclick="mutate()">add mutations</button>
 <button id="create" onclick="makeGenealogy()">new genealogy:</button>
 population size: <select id="popsize"></select>
 generations: <select id="generations"></select>
@@ -35,6 +36,9 @@ var maxpopsize = 40;
 var generations = 25;
 var mingenerations = 3;
 var maxgenerations = 40;
+var mutationRate = 0.05; // FIXME
+var mutationColors = d3.scale.category20(),
+    numMutationColors = 20;
 
 var toggleMarked, toggleExtinct;
 var ancdata, ancestorsMarked, extinctHidden;
@@ -157,7 +161,7 @@ function displayGenealogy(root, tree){
         .attr("r", 4)
         .attr("cx", function(d) { return d.px = d.x; })  // Note that in addition to placing the nodes, these modify data,
         .attr("cy", function(d) { return d.py = d.y; })  // assigning x to px, etc. This must happen before call to line() below.
-	    .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
+            .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
 
     // (Notes: re the assignments d.px = d.x, etc. above in attr calls:
     // This assignment also returns the assigned value.
@@ -172,7 +176,7 @@ function displayGenealogy(root, tree){
     slinks.enter().insert("path", ".node")
         .attr("class", "link")
         .attr("d", line)  // Note line() is a function defined above/below.  Depends on d.px = d.x, etc. above
-	    .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+            .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
 
 function generation (n) {
@@ -244,10 +248,10 @@ function hideExtinct () {
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
         .exit()
-	.attr("opacity", 0);
+        .attr("opacity", 0);
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .exit()
-	.attr("opacity", 0);
+        .attr("opacity", 0);
 }
 
 function unhideExtinct () {
@@ -267,6 +271,36 @@ function line(d){
                                  .y( function(point) { return point.ly; }); // that are used in next lines.
     return linemaker([{lx: d.source.x, ly: d.source.y},
                       {lx: d.target.x, ly: d.target.y}]);
+}
+
+// inefficient ...
+function mutate () {
+    var mutation = 0;
+    for (i = 1; i <= generations; i++) {
+        dgen = generation(i);
+        dgen.forEach(function (d) { // TODO This is not the right distribution.  It should be a Poisson process on branch lengths.
+            if (Math.random() < mutationRate) {
+                d.mutation = mutation++;
+		propagateMutation(d);
+            }
+        });
+    }
+
+    snodes.data(dnodes.filter(function (d) {return d.mutation;}), function (d) {return d.id;})
+        .style("fill", function (d) {return mutationColors(d.mutation % numMutationColors);});
+
+    slinks.data(slinks.data().filter(function (d) {return d.source.mutation;}),
+                function(d) {return d.source.id + "-" + d.target.id;})
+        .style("stroke", function (d) {return mutationColors(d.source.mutation % numMutationColors);});
+}
+
+function propagateMutation (dnode) {
+    if (dnode.children) {
+        dnode.children.forEach(function (d) {
+            d.mutation = dnode.mutation;
+            propagateMutation(d);
+        });
+    }
 }
 
 function printGenealogy () {
