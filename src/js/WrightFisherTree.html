@@ -298,7 +298,7 @@ function mutate () {
         dgen.forEach(function (d) {
             if (Math.random() < mutationRate) {
 	        if (!d.mutations) {d.mutations = [];}
-                d.mutations.unshift(mutation++);
+                d.mutations.unshift(mutation++); // most recent mutation is first in sequence
 		propagateMutation(d);  // any mutation in a descendant will override some of these effects
             }
         });
