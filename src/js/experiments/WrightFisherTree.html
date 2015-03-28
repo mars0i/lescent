@@ -346,4 +346,23 @@ function uniq (ra) {
     return ra.filter (function (v, i, a) { return a.indexOf (v) == i });
 }
 
+// TODO not working supposed to give intermediate color(s)
+// maybe pull apart the 3 hex numbers and divide separately
+function avgcolor (colorstrs) {
+   numnums = colorstrs.length;
+   hexnums = colorstrs.map(function (s) {return parseInt("0x"+s.substr(1));});
+   ornum = Math.round(hexnums.reduce(function(x,y){return x|y;}));  // sum in the sense of ORing
+   avgRed = Math.round(((ornum & 0xff0000) >> 8)/numnums);
+   avgBlue = Math.round(((ornum & 0x00ff00) >> 4)/numnums);
+   avgGreen = Math.round((ornum & 0x0000ff)/numnums);
+   avgnum = (avgRed << 8) + (avgBlue << 4) + avgGreen;
+   return "#"+avgnum.toString(16);
+
+}
+
+function avg (ra) {
+   return ra.reduce(function(x,y){return x+y;})/ra.length;
+}
+
+
 </script>
