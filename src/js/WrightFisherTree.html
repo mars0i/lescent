@@ -15,8 +15,8 @@
 </style>
 
 <body>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<!-- <script src="~/d3/d3.v3.js"></script> -->
+<!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
+<script src="../../../d3.v3.min.js"></script>
 <div id="controls">
 <button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
@@ -224,20 +224,22 @@ function markAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .style("fill", "red");
+        .style("stroke-width", "2");
+        //.style("fill", "red");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", "2")
-        .style("stroke", "red");
+        .style("stroke-width", "4");
+        //.style("stroke", "red");
 }
 
 function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .style("fill", "white");
+        .attr("stroke-width", "1px");
+        //.style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", "1")
-        .style("stroke", "black");
+        .style("stroke-width", "1");
+        //.style("stroke", "black");
 }
 
 function toggleExtinct () {
@@ -283,7 +285,7 @@ function line(d){
 // inefficient e.g. propagates mutations through the full lineage, and then overwrites them with later mutations.
 function mutate () {
 
-    dnodes.forEach(function (d) {d.mutation = false;}); // clear out old effects
+    dnodes.forEach(function (d) {d.mutations = false;}); // clear out old effects
     snodes.style("fill", "white");
     slinks.style("stroke", "black");
 
@@ -295,7 +297,8 @@ function mutate () {
         dgen = generation(i);
         dgen.forEach(function (d) {
             if (Math.random() < mutationRate) {
-                d.mutation = mutation++;
+	        if (!d.mutations) {d.mutations = [];}
+                d.mutations.unshift(mutation++);
 		propagateMutation(d);  // any mutation in a descendant will override some of these effects
             }
         });
@@ -303,18 +306,18 @@ function mutate () {
 
     // then show the mutations in the svg objects:
 
-    snodes.data(dnodes.filter(function (d) {return d.mutation;}), function (d) {return d.id;})
-        .style("fill", function (d) {return mutationColors(d.mutation % numMutationColors);});
+    snodes.data(dnodes.filter(function (d) {return d.mutations;}), function (d) {return d.id;})
+        .style("fill", function (d) {return mutationColors(d.mutations[0] % numMutationColors);});
 
-    slinks.data(slinks.data().filter(function (d) {return d.source.mutation;}),
+    slinks.data(slinks.data().filter(function (d) {return d.source.mutations;}),
                 function(d) {return d.source.id + "-" + d.target.id;})
-        .style("stroke", function (d) {return mutationColors(d.source.mutation % numMutationColors);});
+        .style("stroke", function (d) {return mutationColors(d.source.mutations[0] % numMutationColors);});
 }
 
 function propagateMutation (dnode) {
     if (dnode.children) {
         dnode.children.forEach(function (d) {
-            d.mutation = dnode.mutation;
+            d.mutations = dnode.mutations;
             propagateMutation(d);
         });
     }
