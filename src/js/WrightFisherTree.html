@@ -297,19 +297,19 @@ function line(d){
 function mutate () {
 
     // clear out old effects:
-    dnodes.forEach(function (d) {d.mutations = false;});
+    dnodes.forEach(function (d) {d.mutations = [];});
     snodes.style("fill", "white");
     slinks.style("stroke", "black");
 
     // add mutations to the data nodes:
     var mutation = 0; // id of mutation for a simple infinite-alleles model
+
     // give every indiv the same chance of mutating, and propagate the mutation if so.
     // (we could do the first step separately in a forEach over all indivs.)
     for (i = 1; i <= generations; i++) {
         dgen = generation(i);
         dgen.forEach(function (d) {
             if (Math.random() < mutationRate) {
-	        if (!d.mutations) {d.mutations = [];}
                 d.mutations.unshift(mutation++); // most recent mutation is first in sequence
 		propagateMutation(d);  // any mutation in a descendant will override some of these effects
             }
@@ -328,7 +328,9 @@ function mutate () {
 function propagateMutation (dnode) {
     if (dnode.children) {
         dnode.children.forEach(function (d) {
-            d.mutations = dnode.mutations;
+	console.log(d.mutations);
+	console.log(dnode.mutations);
+            d.mutations = uniq(dnode.mutations.concat(d.mutations));
             propagateMutation(d);
         });
     }
@@ -338,6 +340,11 @@ function printGenealogy () {
     d3.select("#controls").style("visibility", "hidden");
     window.print();
     d3.select("#controls").style("visibility", "visible");
+}
+
+// This is simple.  More efficient ones at http://stackoverflow.com/questions/9229645/remove-duplicates-from-javascript-array:w
+function uniq (ra) {
+    return ra.filter (function (v, i, a) { return a.indexOf (v) == i });
 }
 
 </script>
