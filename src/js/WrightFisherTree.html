@@ -329,7 +329,9 @@ function line(d){
                       {lx: d.target.x, ly: d.target.y}]);
 }
 
-// inefficient e.g. propagates mutations through the full lineage, and then overwrites them with later mutations.
+// Note when a new mutation arises in a lineage that already has mutations, 
+// the earlier mutations are stored but not displayed.  Only the most recent
+// mutation affects appearance.  A future version might make use of the other mutations.
 function mutate () {
 
     // clear out old effects:
@@ -365,7 +367,7 @@ function mutate () {
 function propagateMutation (dnode) {
     if (dnode.children) {
         dnode.children.forEach(function (d) {
-            d.mutations = uniq(dnode.mutations.concat(d.mutations));
+            d.mutations = uniq(dnode.mutations.concat(d.mutations)); // dnode.mutations will contain most recent mutations
             propagateMutation(d);
         });
     }
