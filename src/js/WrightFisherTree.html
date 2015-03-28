@@ -57,7 +57,7 @@ generations: <select id="generations"></select>
 <button id="create" onclick="makeGenealogy()">new genealogy</button>
 <button id="mutate" onclick="mutate()">new mutations</button>
 <button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
-<button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
+<button id="mark" onclick="toggleMarked()">de/emphasize non-extinct</button>
 <button id="print" onclick="printGenealogy()">print</button>
 </div>
 
@@ -126,8 +126,11 @@ generationsControl
     .on("change", function (d) {generations = this.value;}); // action
 
 makeGenealogy();
-//mutate(); // for gist
-//toggleMarked(); // maybe for gist
+// for gist:
+//mutate();
+//ancestorsMarked = true;
+//markAncestors();
+
 
 ///// End of top-level "working code" in this file.
 ////////////////////////////////////////////////
