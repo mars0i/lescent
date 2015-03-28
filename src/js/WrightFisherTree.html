@@ -4,7 +4,6 @@
 
 .node {
   stroke: #000;
-  stroke-width: 1px;
 }
 
 .link {
@@ -39,6 +38,8 @@ var maxgenerations = 40;
 var mutationRate = 0.05; // FIXME
 var mutationColors = d3.scale.category20(),
     numMutationColors = 20;
+var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 2;
+var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 4;
 
 var toggleMarked, toggleExtinct;
 var ancdata, ancestorsMarked, extinctHidden;
@@ -165,6 +166,7 @@ function displayGenealogy(root, tree){
         .append("circle")
         .attr("class", "node")
 	.style("fill", "white")
+	.style("stroke-width", nodeStrokeWidthUnmarked)
         .attr("r", 4)
         .attr("cx", function(d) { return d.px = d.x; })  // Note that in addition to placing the nodes, these modify data,
         .attr("cy", function(d) { return d.py = d.y; })  // assigning x to px, etc. This must happen before call to line() below.
@@ -182,6 +184,7 @@ function displayGenealogy(root, tree){
 
     slinks.enter().insert("path", ".node")
         .attr("class", "link")
+	.style("stroke-width", linkStrokeWidthUnmarked)
         .attr("d", line)  // Note line() is a function defined above/below.  Depends on d.px = d.x, etc. above
             .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
@@ -224,10 +227,10 @@ function markAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .style("stroke-width", "2");
+        .style("stroke-width", nodeStrokeWidthMarked);
         //.style("fill", "red");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", "4");
+        .style("stroke-width", linkStrokeWidthMarked);
         //.style("stroke", "red");
 }
 
@@ -235,10 +238,10 @@ function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .attr("stroke-width", "1px");
+        .style("stroke-width", nodeStrokeWidthUnmarked);
         //.style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", "1");
+        .style("stroke-width", linkStrokeWidthUnmarked);
         //.style("stroke", "black");
 }
 
@@ -285,11 +288,12 @@ function line(d){
 // inefficient e.g. propagates mutations through the full lineage, and then overwrites them with later mutations.
 function mutate () {
 
-    dnodes.forEach(function (d) {d.mutations = false;}); // clear out old effects
+    // clear out old effects:
+    dnodes.forEach(function (d) {d.mutations = false;});
     snodes.style("fill", "white");
     slinks.style("stroke", "black");
 
-    // first add mutations to the data nodes:
+    // add mutations to the data nodes:
     var mutation = 0; // id of mutation for a simple infinite-alleles model
     // give every indiv the same chance of mutating, and propagate the mutation if so.
     // (we could do the first step separately in a forEach over all indivs.)
@@ -305,7 +309,6 @@ function mutate () {
     }
 
     // then show the mutations in the svg objects:
-
     snodes.data(dnodes.filter(function (d) {return d.mutations;}), function (d) {return d.id;})
         .style("fill", function (d) {return mutationColors(d.mutations[0] % numMutationColors);});
 
