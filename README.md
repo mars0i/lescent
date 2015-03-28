@@ -1,6 +1,6 @@
 Lescent makes diagrams for lessons on the coalescent, i.e. diagrams
-that may be useful for teaching coalescent concepts (and related
-concepts).
+that may be useful for teaching coalescent concepts and other related
+concepts.
 
 Live demo: <a href="http://bl.ocks.org/mars0i/e08f6e578076560bf3bf">http://bl.ocks.org/mars0i/e08f6e578076560bf3bf</a><br/>
 Github gist page: <a href="https://gist.github.com/mars0i/e08f6e578076560bf3bf">https://gist.github.com/mars0i/e08f6e578076560bf3bf</a><br/>
