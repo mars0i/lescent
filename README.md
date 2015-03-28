@@ -21,8 +21,8 @@ If you find lescent useful, feel free to let me know.
 
 ### What it does:
 
-Generates a schematic diagram of a random genealogy with fixed
-population size and discrete genreations.  There are options to
+Lescent generates a schematic diagram of a random genealogy with fixed
+population size and discrete generations.  There are options to
 highlight or show only those lineages that still have members in the
 latest generation, and to show how mutations propagate.  Lescent is a
 forward Wright-Fisher simulation with fixed population size, 
