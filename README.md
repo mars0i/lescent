@@ -40,7 +40,7 @@ Controls (choose "Open in a new window") allow:
 
 ### Things to try:
 
-Click on the "Open in a new window." link, and experiment with the
+Click on the "Open in a new window" link, and experiment with the
 buttons at the bottom.
 
 (The print button is useful for generating PDF diagrams if your
