@@ -25,8 +25,8 @@ Generates a schematic diagram of a random genealogy with fixed
 population size and discrete genreations.  There are options to
 highlight or show only those lineages that still have members in the
 latest generation, and to show how mutations propagate.  Lescent is a
-forward Wright-Fisher simulation with asexual reproduction and no
-natural selection.
+forward Wright-Fisher simulation with fixed population size, 
+asexual reproduction, and no natural selection.
 
 Controls (choose "Open in a new window") allow:
 
@@ -48,12 +48,20 @@ software allows you to generate PDFs using your printing system.)
 
 ### Things to notice:
 
-Usually, not all members of a population succed in producing offspring who
-make it to adulthood.  This is likely to happen purely by chance, even without any
-influence of natural selection.  (It's unlikely only when a population is growing *very*
-rapidly.)  So in each generation, some lineages are lost.  As a result, very few members
-of the population have descendants after many generations.  Many genetic variants are
-lost in this way, even after they spread.
+Generations are represented by circles at the same height.  The earliest
+generation is at the top; the most recent one is at the bottom.  Each
+generation has exactly the number of organisms.  Mutations are
+represented by colors.  In the version of the diagram that's displayed
+first, thicker lines represent those lineages that last until the most
+recent generation.
+
+Usually, not all members of a population succed in producing offspring
+who make it to adulthood.  This is likely to happen purely by chance,
+even without any influence of natural selection.  (It's unlikely only
+when a population is growing *very* rapidly.)  So in each generation,
+some lineages are lost.  As a result, very few members of the
+population have descendants after many generations.  Many genetic
+variants are lost in this way, even after they spread.
 
 When scientists do computer simulations of evolutionary processes--for
 example to generate simulated genetic data for comparison with real
