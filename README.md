@@ -30,7 +30,7 @@ natural selection.
 
 Controls (choose "Open in a new window") allow:
 
-* Setting population size and number of generations for new genealogy.
+* Setting population size and number of generations for a new genealogy.
 * Generating a new genealogy.
 * Generating mutations.
 * Showing only lineages still present in the last generation.
