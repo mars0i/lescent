@@ -2,6 +2,11 @@
 <meta charset="utf-8">
 <style>
 
+#controls {
+  font-family:arial;
+  font-size:12px;
+  font-weight:bold;
+}
 .node {
   stroke: #000;
 }
@@ -10,6 +15,36 @@
   fill: none;
   stroke: #000;
 }
+button {
+  background-color:#a4a0a8;
+  border:2px solid #504060;
+  display:inline-block;
+  cursor:pointer;
+  color:#000000;
+  font-family:arial;
+  font-size:12px;
+  font-weight:bold;
+  padding:1px 6px;
+  text-decoration:none;
+}
+button:hover {
+  background-color:#c0a0a0;
+}
+button:active {
+  position:relative;
+  top:1px;
+}
+select {
+   background: transparent;
+   width: 50px;
+   padding: 2px;
+   font-size: 11px;
+   line-height: 1;
+   border: 1;
+   border-radius: 0;
+   height: 22px;
+}
+
 
 </style>
 
@@ -17,12 +52,12 @@
 <!-- <script src="http://d3js.org/d3.v3.min.js"></script> -->
 <script src="../../../d3.v3.min.js"></script>
 <div id="controls">
-<button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
-<button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
-<button id="mutate" onclick="mutate()">add mutations</button><br/>
-<button id="create" onclick="makeGenealogy()">new genealogy:</button>
-population size: <select id="popsize"></select>
+pop size: <select id="popsize"></select>
 generations: <select id="generations"></select>
+<button id="create" onclick="makeGenealogy()">new genealogy</button>
+<button id="mutate" onclick="mutate()">new mutations</button>
+<button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
+<button id="mark" onclick="toggleMarked()">mark/unmark ancestors</button>
 <button id="print" onclick="printGenealogy()">print</button>
 </div>
 
@@ -165,8 +200,8 @@ function displayGenealogy(root, tree){
     snodes.enter()
         .append("circle")
         .attr("class", "node")
-	.style("fill", "white")
-	.style("stroke-width", nodeStrokeWidthUnmarked)
+        .style("fill", "white")
+        .style("stroke-width", nodeStrokeWidthUnmarked)
         .attr("r", 4)
         .attr("cx", function(d) { return d.px = d.x; })  // Note that in addition to placing the nodes, these modify data,
         .attr("cy", function(d) { return d.py = d.y; })  // assigning x to px, etc. This must happen before call to line() below.
@@ -184,7 +219,7 @@ function displayGenealogy(root, tree){
 
     slinks.enter().insert("path", ".node")
         .attr("class", "link")
-	.style("stroke-width", linkStrokeWidthUnmarked)
+        .style("stroke-width", linkStrokeWidthUnmarked)
         .attr("d", line)  // Note line() is a function defined above/below.  Depends on d.px = d.x, etc. above
             .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
 }
@@ -228,12 +263,12 @@ function markAncestors () {
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
         .style("stroke-width", nodeStrokeWidthMarked)
-	.exit()
+        .exit()
         .style("stroke-width", 0);
         //.style("fill", "red");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", linkStrokeWidthMarked)
-	.exit()
+        .exit()
         .style("stroke-dasharray", "1,1");
         //.style("stroke", "red");
 }
@@ -243,12 +278,12 @@ function unmarkAncestors () {
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
         .style("stroke-width", nodeStrokeWidthUnmarked)
-	.exit()
+        .exit()
         .style("stroke-width", nodeStrokeWidthUnmarked);
         //.style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", linkStrokeWidthUnmarked)
-	.exit()
+        .exit()
         .style("stroke-dasharray", "none");
         //.style("stroke", "black");
 }
@@ -311,7 +346,7 @@ function mutate () {
         dgen.forEach(function (d) {
             if (Math.random() < mutationRate) {
                 d.mutations.unshift(mutation++); // most recent mutation is first in sequence
-		propagateMutation(d);  // any mutation in a descendant will override some of these effects
+        	propagateMutation(d);  // any mutation in a descendant will override some of these effects
             }
         });
     }
