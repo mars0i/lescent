@@ -39,7 +39,7 @@ var mutationRate = 0.05; // FIXME
 var mutationColors = d3.scale.category20(),
     numMutationColors = 20;
 var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 2;
-var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 4;
+var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 3;
 
 var toggleMarked, toggleExtinct;
 var ancdata, ancestorsMarked, extinctHidden;
@@ -227,10 +227,14 @@ function markAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
-        .style("stroke-width", nodeStrokeWidthMarked);
+        .style("stroke-width", nodeStrokeWidthMarked)
+	.exit()
+        .style("stroke-width", 0);
         //.style("fill", "red");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", linkStrokeWidthMarked);
+        .style("stroke-width", linkStrokeWidthMarked)
+	.exit()
+        .style("stroke-dasharray", "1,1");
         //.style("stroke", "red");
 }
 
@@ -238,10 +242,14 @@ function unmarkAncestors () {
     if (!ancdata)
         fillAncData();
     snodes.data(ancdata.nodes, function(d){return d.id;})
+        .style("stroke-width", nodeStrokeWidthUnmarked)
+	.exit()
         .style("stroke-width", nodeStrokeWidthUnmarked);
         //.style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
-        .style("stroke-width", linkStrokeWidthUnmarked);
+        .style("stroke-width", linkStrokeWidthUnmarked)
+	.exit()
+        .style("stroke-dasharray", "none");
         //.style("stroke", "black");
 }
 
