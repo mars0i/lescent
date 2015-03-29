@@ -6,13 +6,11 @@ Live demo: <a href="http://bl.ocks.org/mars0i/e08f6e578076560bf3bf">http://bl.oc
 Github gist page: <a href="https://gist.github.com/mars0i/e08f6e578076560bf3bf">https://gist.github.com/mars0i/e08f6e578076560bf3bf</a><br/>
 Full github repository with latest source code: <a href="https://github.com/mars0i/lescent">https://github.com/mars0i/lescent</a>
 
-This project began with modifications of Mike Bostock's Random Tree:
-<a
-href="http://bl.ocks.org/mbostock/999346">http://bl.ocks.org/mbostock/999346</a>.
+This project began with modifications of Mike Bostock's <a href="http://bl.ocks.org/mbostock/999346">Random Tree</a>.
 All new text and software is copyright 2015 by Marshall Abrams.  (<a
 href="http://members.logical.net/~marshall">http://members.logical.net/~marshall</a>,
 m a b r a m s &nbsp;&nbsp;at&nbsp;&nbsp; u a b
-&nbsp;&nbsp;dot&nbsp;&nbsp; e d u). It is distributed
+&nbsp;&nbsp;dot&nbsp;&nbsp; e d u), and is distributed
 under the Gnu General Public License version 3.0, available in the
 file LICENSE at  <a
 href="https://github.com/mars0i/lescent/blob/master/LICENSE">https://github.com/mars0i/lescent/blob/master/LICENSE</a>.
@@ -26,25 +24,30 @@ population size and discrete generations.  There are options to
 highlight or show only those lineages that still have members in the
 latest generation, and to show how mutations propagate.  Lescent is a
 forward Wright-Fisher simulation with fixed population size, 
-asexual reproduction, and no natural selection.
+asexual reproduction, and no natural selection.  Mutations in lescent
+are best thought of as following an infinite alleles model. Each new
+color represents a new mutation, which replaces the old one.
 
-Controls (choose "Open in a new window") allow:
+Controls (choose "Open in a new window"):
 
-* Setting population size and number of generations for a new genealogy.
-* Generating a new genealogy.
-* Generating mutations.
-* Showing only lineages still present in the last generation.
-* Hiding all other lineages.
+* Set population size and number of generations for a new genealogy.
+* Generate a new genealogy.
+* Generate mutations.
+* Show only lineages still present in the last generation.
+* Hid lineages not present in the last generation.
 * Emphasizing lineages present in the last generation, and de-emphasizing others.
 * Printing the page (without the buttons).
 
-### Things to try:
+Experimenting with the buttons will make these options clearer.  Try
+clicking "New genealogy" first.  You may need to click on "Open in new
+window" to see the buttons.
 
-Click on the "Open in a new window" link, and experiment with the
-buttons at the bottom.
+The print button is useful for generating PDF diagrams if your
+software allows you to generate PDFs using your printing system.
 
-(The print button is useful for generating PDF diagrams if your
-software allows you to generate PDFs using your printing system.)
+Lescent uses a fixed number of colors, so if there are too many
+mutations in a diagram, they will repeat.  (If you see the same color
+in disconnected regions, they represent different mutations.)
 
 ### Things to notice:
 
@@ -55,7 +58,7 @@ represented by colors.  In the version of the diagram that's displayed
 first, thicker lines represent those lineages that last until the most
 recent generation.
 
-Usually, not all members of a population succed in producing offspring
+Usually, not all members of a population succeed in producing offspring
 who make it to adulthood.  This is likely to happen purely by chance,
 even without any influence of natural selection.  (It's unlikely only
 when a population is growing *very* rapidly.)  So in each generation,
@@ -70,7 +73,7 @@ just thrown away because it represents lineages that don't last into the
 present.  That's what this program illustrates: With a "forward"
 simulation that runs from the past to the present, a lot of data is
 generated for no good reason.  To see this, try using the "Hide/show
-exitinct" and "de/emphasize non-exinct" buttons.  (While the lescent
+extinct" and "de/emphasize non-extinct" buttons.  (While the lescent
 program runs quickly, that's because it simulates very few organisms in
 very few generations, and their "genes" consist of a few numbers.)
 
@@ -79,7 +82,7 @@ generate lineages beginning from the present and moving backward in
 time.  Lineages that don't reach the present are never generated.
 (Although lescent is not a coalescent simulation, the kind of pattern
 that coalescent simulations generate can be illustrated with it by
-using the button that hides the exinct lineages.)  Then, once a tree
+using the button that hides the extinct lineages.)  Then, once a tree
 of lineages has been generated, patterns representing genetic data can
 be added to the lineages.  This can be illustrated using lescent with
 the "new mutations" button.
@@ -112,10 +115,18 @@ From the authors of the book *Gene Genealogies*, listed above:
 The Wright-Fisher animator and Hudson animator at <a
 href="www.coalescent.dk">www.coalescent.dk</a>.
 
-### Note:
+### Notes:
 
 "Wright-Fisher model" in this context doesn't imply that there are
 multiple alleles that are tracked; all that's required for generating a
 genealogical tree using a Wright-Fisher model is that reproductive
 success be random (with replacement) in discrete generations with fixed
 population size.
+
+Lescent is written using d3.js, a Javascript library.
+
+Internally, an individual in lescent stores all mutations that
+occurred  its ancestors. In that sense, lescent is more like an
+infinite sites model than an infinite alleles model.  However, at
+present, only the most recent mutation affects color, which is why I
+described above in terms of the infinite alleles model.
