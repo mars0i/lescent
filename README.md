@@ -32,7 +32,7 @@ Controls (choose "Open in a new window"):
 
 * Set population size and number of generations for a new genealogy.
 * Generate a new genealogy.
-* Generate mutations.
+* Generate new mutations, after removing all existing ones.
 * Show only lineages still present in the last generation.
 * Hid lineages not present in the last generation.
 * Emphasizing lineages present in the last generation, and de-emphasizing others.
