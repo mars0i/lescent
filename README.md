@@ -23,20 +23,21 @@ Lescent generates a schematic diagram of a random genealogy with fixed
 population size and discrete generations.  There are options to
 highlight or show only those lineages that still have members in the
 latest generation, and to show how mutations propagate.  Lescent is a
-forward Wright-Fisher simulation with fixed population size, 
-asexual reproduction, and no natural selection.  Mutations in lescent
-are best thought of as following an infinite alleles model. Each new
-color represents a new mutation, which replaces the old one.
+forward Wright-Fisher simulation with fixed population size,  asexual
+reproduction, and no natural selection.  Mutations in lescent are best
+thought of as following an infinite alleles model. Each new color
+represents a new mutation, which replaces the old one. (However,
+lescent uses a fixed number of colors, so the same color may be reused 
+for different mutations when there are many mutations.)
 
-Controls (choose "Open in a new window"):
+Controls (choose "Open in a new window" if neceessary):
 
-* Set population size and number of generations for a new genealogy.
-* Generate a new genealogy.
-* Generate new mutations, after removing all existing ones.
-* Show only lineages still present in the last generation.
-* Hid lineages not present in the last generation.
-* Emphasizing lineages present in the last generation, and de-emphasizing others.
-* Printing the page (without the buttons).
+* **pop size**, **generations**: Set population size and number of generations for a new genealogy.
+* **new genealogy**: Generate a new genealogy.
+* **new mutations**: Remove all mutations and generate new mutations.
+* **hide/show extinct**: Show only lineages still present in the last generation.
+* **de/emphasize non-extinct**: Emphasize lineages present in the last generation, de-emphasizing others.
+* **print**: Print the page without buttons and other controls.
 
 Experimenting with the buttons will make these options clearer.  Try
 clicking "New genealogy" first.  You may need to click on "Open in new
@@ -44,10 +45,6 @@ window" to see the buttons.
 
 The print button is useful for generating PDF diagrams if your
 software allows you to generate PDFs using your printing system.
-
-Lescent uses a fixed number of colors, so if there are too many
-mutations in a diagram, they will repeat.  (If you see the same color
-in disconnected regions, they represent different mutations.)
 
 ### Things to notice:
 
