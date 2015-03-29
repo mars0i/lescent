@@ -110,7 +110,7 @@ Oxford University Press, 2005.
 by John Wakely<br/>
 Roberts and Company, 2009.
 
-### Some related graphical tools on the web that may be of interest:
+### Some related graphical tools on the web:
 
 From <a href="http://bedford.io/projects">Trevor Bedford</a>:
 ancestry, coaltrace, divergence, haplotypes, stem, and nextflu. 
