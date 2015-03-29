@@ -7,17 +7,17 @@ Github gist page: <a href="https://gist.github.com/mars0i/e08f6e578076560bf3bf">
 Full github repository with latest source code: <a href="https://github.com/mars0i/lescent">https://github.com/mars0i/lescent</a>
 
 This project began with modifications of Mike Bostock's Random Tree:
-<a href="http://bl.ocks.org/mbostock/999346">http://bl.ocks.org/mbostock/999346</a>.
-All new text and software is copyright 2015 by Marshall Abrams. The
-software is distributed under the Gnu General Public License version
-3.0, available in the file LICENSE at 
-<a href="https://github.com/mars0i/lescent/blob/master/LICENSE">https://github.com/mars0i/lescent/blob/master/LICENSE</a>.
+<a
+href="http://bl.ocks.org/mbostock/999346">http://bl.ocks.org/mbostock/999346</a>.
+All new text and software is copyright 2015 by Marshall Abrams.  (<a
+href="http://members.logical.net/~marshall">http://members.logical.net/~marshall</a>,
+m a b r a m s &nbsp;&nbsp;at&nbsp;&nbsp; u a b
+&nbsp;&nbsp;dot&nbsp;&nbsp; e d u). It is distributed
+under the Gnu General Public License version 3.0, available in the
+file LICENSE at  <a
+href="https://github.com/mars0i/lescent/blob/master/LICENSE">https://github.com/mars0i/lescent/blob/master/LICENSE</a>.
 
-Author:
-Marshall Abrams 
-<a href="http://members.logical.net/~marshall">http://members.logical.net/~marshall</a>
-(m a b r a m s &nbsp;&nbsp;at&nbsp;&nbsp; u a b &nbsp;&nbsp;dot&nbsp;&nbsp; e d u) <br/>
-If you find lescent useful, feel free to let me know.
+If you find lescent useful, feel free to let me know.&nbsp; -Marshall
 
 ### What it does:
 
