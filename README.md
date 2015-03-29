@@ -121,13 +121,15 @@ href="www.coalescent.dk">www.coalescent.dk</a>.
 
 ### Notes:
 
+Lescent is written using <a href="http://d3js.org">d3.js</a>, a
+Javascript library by Mike Bostock.  There are a number of good books
+and web resources on d3.js that are available.
+
 "Wright-Fisher model" in this context doesn't imply that there are
 multiple alleles that are tracked; all that's required for generating a
 genealogical tree using a Wright-Fisher model is that reproductive
 success be random (with replacement) in discrete generations with fixed
 population size.
-
-Lescent is written using d3.js, a Javascript library.
 
 Internally, an individual in lescent stores all mutations that
 occurred  its ancestors. In that sense, lescent is more like an
