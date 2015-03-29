@@ -22,15 +22,26 @@ If you find lescent useful, feel free to let me know.&nbsp; -Marshall
 Lescent generates a schematic diagram of a random genealogy with fixed
 population size and discrete generations.  There are options to
 highlight or show only those lineages that still have members in the
-latest generation, and to show how mutations propagate.  Lescent is a
-forward Wright-Fisher simulation with fixed population size,  asexual
-reproduction, and no natural selection.  Mutations in lescent are best
-thought of as following an infinite alleles model. Each new color
-represents a new mutation, which replaces the old one. (However,
-lescent uses a fixed number of colors, so the same color may be reused 
-for different mutations when there are many mutations.)
+latest generation, and to show how mutations propagate.  
 
-Controls (choose "Open in a new window" if neceessary):
+Lescent is a forward Wright-Fisher simulation with fixed population
+size, asexual reproduction, and no natural selection.  Lescent's name
+reflects its pedagogical purpose; it's not a coalescent simulation.
+Mutations in lescent are best thought of as following an infinite
+alleles model.  Each new color represents a new mutation, which replaces
+the old one.  (However, lescent uses a fixed number of colors, so the
+same color may be reused for different mutations when there are many
+mutations.)
+
+For a more informal introduction to the purpose of lescent, see
+"Things to notice" below.
+
+### How to use it:
+
+Experiment with the buttons.  Try clicking "New genealogy" first.  You
+may need to click on "Open in new window" first.
+
+Controls (choose "Open in a new window" if necessary):
 
 * **pop size**, **generations**: Set population size and number of generations for a new genealogy.
 * **new genealogy**: Generate a new genealogy.
@@ -39,12 +50,8 @@ Controls (choose "Open in a new window" if neceessary):
 * **de/emphasize non-extinct**: Emphasize lineages present in the last generation, de-emphasizing others.
 * **print**: Print the page without buttons and other controls.
 
-Experimenting with the buttons will make these options clearer.  Try
-clicking "New genealogy" first.  You may need to click on "Open in new
-window" to see the buttons.
-
-The print button is useful for generating PDF diagrams if your
-software allows you to generate PDFs using your printing system.
+The print button is useful for generating PDF diagrams if your software
+allows you to generate PDFs using your printing system.
 
 ### Things to notice:
 
@@ -66,23 +73,23 @@ variants are lost in this way, even after they spread.
 When scientists do computer simulations of evolutionary processes--for
 example to generate simulated genetic data for comparison with real
 genetic data--it's inefficient to generate lots of genetic data that is
-just thrown away because it represents lineages that don't last into the
-present.  That's what this program illustrates: With a "forward"
-simulation that runs from the past to the present, a lot of data is
-generated for no good reason.  To see this, try using the "Hide/show
-extinct" and "de/emphasize non-extinct" buttons.  (While the lescent
-program runs quickly, that's because it simulates very few organisms in
-very few generations, and their "genes" consist of a few numbers.)
+just thrown away: Lineages that don't last into the present can't
+simulate present-day data.  That's part of what lescent illustrates:
+With a "forward" simulation that runs from the past to the present, a
+lot of data is generated for no good reason.  To see this, try using the
+"Hide/show extinct" and "de/emphasize non-extinct" buttons.  (Lescent
+runs quickly, but that's because it simulates very few organisms in very
+few generations, with "genes" that consist of a few numbers.)
 
-As a result, scientists often use "coalescent" simulations, which
-generate lineages beginning from the present and moving backward in
-time.  Lineages that don't reach the present are never generated.
-(Although lescent is not a coalescent simulation, the kind of pattern
+Thus scientists studying evolutionary processes often use "coalescent"
+simulations, which generate lineages beginning from the present and
+moving backward in time.  Lineages that don't reach the present are
+never generated.  Then, once a tree of lineages has been generated,
+patterns representing genetic data can be added to the lineages.  This
+can be illustrated using lescent with the "new mutations" button.
+Although lescent is not a coalescent simulation, the kind of pattern
 that coalescent simulations generate can be illustrated with it by
-using the button that hides the extinct lineages.)  Then, once a tree
-of lineages has been generated, patterns representing genetic data can
-be added to the lineages.  This can be illustrated using lescent with
-the "new mutations" button.
+using the button that hides the extinct lineages.
 
 ### More info about the coalescent:
 
