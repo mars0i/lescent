@@ -110,7 +110,7 @@ ancestry, coaltrace, divergence, haplotypes, stem, and nextflu.
 
 From the authors of the book *Gene Genealogies*, listed above:
 The Wright-Fisher animator and Hudson animator at <a
-href="www.coalescent.dk">www.coalescent.dk</a>, 
+href="www.coalescent.dk">www.coalescent.dk</a>.
 
 ### Note:
 
