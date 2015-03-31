@@ -132,7 +132,7 @@ href="www.coalescent.dk">www.coalescent.dk</a>.
 
 * Lescent is written using <a href="http://d3js.org">d3.js</a>, a
 Javascript library by Mike Bostock.  There are a number of good books
-and web resources on d3.js that are available.
+and web resources on d3.js.
 
 * "Wright-Fisher model" in this context doesn't imply that there are
 multiple alleles that are tracked; all that's required for generating a
