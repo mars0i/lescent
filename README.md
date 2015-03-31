@@ -22,9 +22,9 @@ If you find lescent useful, feel free to let me know.&nbsp; -Marshall
 Lescent generates a schematic diagram of a random genealogy, with fixed
 population size and discrete generations.  There are options to
 highlight or show only those lineages that still have members in the
-latest generation, and to show how mutations propagate.  
-For an informal introduction to the concepts that lescent illustrates,
-see "Things to notice" below.
+latest generation, and to show how mutations propagate.  For an informal
+introduction to the concepts that lescent illustrates, see "Things to
+notice" below.
 
 Specifically, lescent is a forward Wright-Fisher simulation with fixed
 population size, asexual reproduction, and no natural selection. 
