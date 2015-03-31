@@ -10,7 +10,6 @@
 .node {
   stroke: #000;
 }
-
 .link {
   fill: none;
   stroke: #000;
@@ -73,8 +72,8 @@ var maxgenerations = 40;
 var mutationRate = 0.05;
 var mutationColors = d3.scale.category20(),
     numMutationColors = 20;
-var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 2;
-var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 3;
+var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 1.5, nodeStrokeWidthBackground = 1;
+var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 1.5;
 
 var toggleMarked, toggleExtinct;
 var ancdata, ancestorsMarked, extinctHidden;
@@ -91,7 +90,7 @@ var initsvg = d3.select("body").insert("svg", "#controls")
 initsvg.append("rect")
     .attr("width", "100%")
     .attr("height", "100%")
-    .attr("fill", "#909090");
+    .attr("fill", "#a0a0a0");
 
 var svg = initsvg.append("g")
     .attr("transform", "translate(10,10)");
@@ -267,7 +266,7 @@ function markAncestors () {
     snodes.data(ancdata.nodes, function(d){return d.id;})
         .style("stroke-width", nodeStrokeWidthMarked)
         .exit()
-        .style("stroke-width", 0);
+        .style("stroke-width", nodeStrokeWidthBackground);
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", linkStrokeWidthMarked)
         .exit()
@@ -357,9 +356,10 @@ function mutate () {
     snodes.data(dnodes.filter(function (d) {return d.mutations;}), function (d) {return d.id;})
         .style("fill", function (d) {return d.mutations.length ? mutationColors(d.mutations[0] % numMutationColors) : "white";});
 
-    slinks.data(slinks.data().filter(function (d) {return d.source.mutations;}),
-                function(d) {return d.source.id + "-" + d.target.id;})
-        .style("stroke", function (d) {return d.source.mutations.length ? mutationColors(d.source.mutations[0] % numMutationColors) : "black";});
+    // This changes link colors to parent organism's color.
+    //slinks.data(slinks.data().filter(function (d) {return d.source.mutations;}),
+    //            function(d) {return d.source.id + "-" + d.target.id;})
+    //    .style("stroke", function (d) {return d.source.mutations.length ? mutationColors(d.source.mutations[0] % numMutationColors) : "black";});
 }
 
 function propagateMutation (dnode) {
