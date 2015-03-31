@@ -65,12 +65,12 @@ generations: <select id="generations"></select>
 // var width  = 960, height = 500; // for gist
 var width  = 800, height = 600;    // probably good for presentations
 
-var popsize = 20;     // default value--might be changed by user.
+var popsize = 20;
 var maxpopsize = 40;
 var generations = 25;
 var mingenerations = 3;
 var maxgenerations = 40;
-var mutationRate = 0.05; // FIXME
+var mutationRate = 0.05;
 var mutationColors = d3.scale.category20(),
     numMutationColors = 20;
 var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 2;
@@ -125,6 +125,7 @@ generationsControl
     .property("value", generations)  // default value
     .on("change", function (d) {generations = this.value;}); // action
 
+// Setup is done. The next few lines are what make everything happen.
 makeGenealogy();
 mutate();
 ancestorsMarked = true;
@@ -214,8 +215,7 @@ function displayGenealogy(root, tree){
     // This assignment also returns the assigned value.
     // It's possible to move the assignment to a separate earlier step using snodes.each().
     // But then you *must* use d.x, d.y for the values of cx, cy.  px, py won't work.
-    // Which doesn't make sense to me.  Maybe those get modified before that point, so
-    // There actually is a reason to embed the assignments in the attr calls.)
+    // (Why? Maybe those get modified before that point?)
 
     // Recompute the layout and data join:
     slinks = slinks.data(tree.links(dnodes), function(d) { return d.source.id + "-" + d.target.id; }); // needed as separate step so toplevel slinks has correct value
@@ -268,12 +268,10 @@ function markAncestors () {
         .style("stroke-width", nodeStrokeWidthMarked)
         .exit()
         .style("stroke-width", 0);
-        //.style("fill", "red");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", linkStrokeWidthMarked)
         .exit()
         .style("stroke-dasharray", "1,1");
-        //.style("stroke", "red");
 }
 
 function unmarkAncestors () {
@@ -283,12 +281,10 @@ function unmarkAncestors () {
         .style("stroke-width", nodeStrokeWidthUnmarked)
         .exit()
         .style("stroke-width", nodeStrokeWidthUnmarked);
-        //.style("fill", "white");
     slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
         .style("stroke-width", linkStrokeWidthUnmarked)
         .exit()
         .style("stroke-dasharray", "none");
-        //.style("stroke", "black");
 }
 
 function toggleExtinct () {
