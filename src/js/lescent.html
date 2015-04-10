@@ -15,7 +15,7 @@
   stroke: #000;
 }
 button {
-  background-color:#a4a0a8;
+  background-color:#c4c0c8;
   border:2px solid #504060;
   display:inline-block;
   cursor:pointer;
@@ -50,6 +50,7 @@ select {
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <!-- <script src="../../../d3.v3.min.js"></script> -->
+<div id="svgdiv"></div>
 <div id="controls">
 pop size: <select id="popsize"></select>
 generations: <select id="generations"></select>
@@ -74,6 +75,7 @@ var mutationColors = d3.scale.category20(),
     numMutationColors = 20;
 var nodeStrokeWidthUnmarked = 1, nodeStrokeWidthMarked = 1.5, nodeStrokeWidthBackground = 1;
 var linkStrokeWidthUnmarked = 1, linkStrokeWidthMarked = 1.5;
+var bgcolor = "#a0a0a0";
 
 var toggleMarked, toggleExtinct;
 var ancdata, ancestorsMarked, extinctHidden;
@@ -83,14 +85,17 @@ var ancdata, ancestorsMarked, extinctHidden;
 var dnodes, snodes, tree;
 
 //// set up SVG area
-var initsvg = d3.select("body").insert("svg", "#controls")
+d3.select("#svgdiv").style("background-color", bgcolor);
+//d3.select("#controls").style("background-color", bgcolor);
+
+var initsvg = d3.select("#svgdiv").insert("svg", "#controls")
     .attr("width", width)
     .attr("height", height);
 
 initsvg.append("rect")
     .attr("width", "100%")
     .attr("height", "100%")
-    .attr("fill", "#a0a0a0");
+    .attr("fill", bgcolor);
 
 var svg = initsvg.append("g")
     .attr("transform", "translate(10,10)");
