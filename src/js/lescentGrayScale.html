@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+#controls {
+  font-family:arial;
+  font-size:12px;
+  font-weight:bold;
+}
+.node {
+  stroke: #000;
+}
+.link {
+  fill: none;
+  stroke: #000;
+}
+button {
+  background-color:#c4c0c8;
+  border:2px solid #504060;
+  display:inline-block;
+  cursor:pointer;
+  color:#000000;
+  font-family:arial;
+  font-size:12px;
+  font-weight:bold;
+  padding:1px 2px;
+  text-decoration:none;
+}
+button:hover {
+  background-color:#c0a0a0;
+}
+button:active {
+  position:relative;
+  top:1px;
+}
+select {
+   background: transparent;
+   width: 50px;
+   padding: 1px;
+   font-size: 11px;
+   line-height: 1;
+   border: 1;
+   border-radius: 0;
+   height: 22px;
+}
+
+
+</style>
+
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<!-- <script src="../../../d3.v3.min.js"></script> -->
+<div id="svgdiv"></div>
+<div id="controls">
+pop size: <select id="popsize"></select>
+generations: <select id="generations"></select>
+<button id="create" onclick="makeGenealogy()">new genealogy</button>
+<button id="mutate" onclick="mutate()">new mutations</button>
+<button id="extinct" onclick="toggleExtinct()">hide/show extinct</button>
+<button id="mark" onclick="toggleMarked()">de/emphasize non-extinct</button>
+<button id="print" onclick="printGenealogy()">print</button>
+</div>
+
+<script>
+var width  = 900, height = 650; // good for printing landscape
+
+var popsize = 20;
+var maxpopsize = 40;
+var generations = 25;
+var mingenerations = 3;
+var maxgenerations = 40;
+var mutationRate = 0.05;
+var mutationColors = function (i){return ["#f7f7f7", "#d9d9d9", "#bdbdbd", "#969696", "#636363", "#252525"][i];},
+    numMutationColors = 6;
+var nodeStrokeWidthUnmarked = 1.5, nodeStrokeWidthMarked = 2.25, nodeStrokeWidthBackground = 1;
+var linkStrokeWidthUnmarked = 1.5, linkStrokeWidthMarked = 3.25;
+var nodeRadius = 6;
+var bgcolor = "#FFFFFF";
+
+var toggleMarked, toggleExtinct;
+var ancdata, ancestorsMarked, extinctHidden;
+
+// NOTE: dnodes refers to the *data* tree nodes, i.e. individuals in generations (except for the hidden, root node). (What Bostock calls "nodes".)
+//       snodes refers to the *svg* tree nodes (g's containing circles).  (What Bostock calls "node".)
+var dnodes, snodes, tree;
+
+//// set up SVG area
+d3.select("#svgdiv").style("background-color", bgcolor);
+//d3.select("#controls").style("background-color", bgcolor);
+
+var initsvg = d3.select("#svgdiv").insert("svg", "#controls")
+    .attr("width", width)
+    .attr("height", height);
+
+initsvg.append("rect")
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .attr("fill", bgcolor);
+
+var svg = initsvg.append("g")
+    .attr("transform", "translate(10,10)");
+
+//// set up controls div
+d3.select("#controls").style({"width":(width+"px"), "text-align":"center"});
+
+///// set up population size dropdown
+var popsizeControl = d3.select("#popsize");
+
+popsizeControl.selectAll("option")    // add numeric options
+    .data(d3.range(1,maxpopsize+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+popsizeControl
+    .property("value", popsize)  // default value
+    .on("change", function (d) {popsize = this.value;}); // action
+
+///// set up generations dropdown
+var generationsControl = d3.select("#generations");
+
+generationsControl.selectAll("option")    // add numeric options
+    .data(d3.range(mingenerations, maxgenerations+1))
+    .enter()
+    .append("option")
+    .text(function (d) {return d;});
+
+generationsControl
+    .property("value", generations)  // default value
+    .on("change", function (d) {generations = this.value;}); // action
+
+// Setup is done. The next few lines are what make everything happen.
+makeGenealogy();
+mutate();
+ancestorsMarked = true;
+markAncestors();
+
+
+///// End of top-level "working code" in this file.
+////////////////////////////////////////////////
+
+function addRoot (tree) {
+    var root = {id:0};
+    var dnodes = tree.nodes(root);
+    root.parent = root;
+    root.px = root.x;
+    root.py = root.y;
+    return dnodes;
+}
+
+function makeTree () {
+    return tree = d3.layout.tree()
+        .size([width - 20, height - 20])
+        .separation(function (a, b) {return a.parent == b.parent ? 7 : 10;}); // does this work??
+}
+
+function makeGenealogy () {
+
+    // clear out vars, svg for new genealogy
+    ancdata = undefined;
+    ancestorsMarked = false;
+    extinctHidden = false;
+    svg.selectAll("*").remove(); // clear out contents of svg from any preceding call to this function
+
+    tree = makeTree();
+
+    dnodes = addRoot(tree);
+    root = dnodes[0];
+
+    // build the genealogy data in a loop
+    for (k = 0; k < generations; k++) {
+        makeGenerationData();
+    }
+
+    // create the svg based on the data
+    displayGenealogy(root, tree);
+
+    ///// End of "working code" in the makeGenealogy() function.
+    ///// The rest of this contains only function definitions and a few variable
+    ///// defs used in the functions below.
+    /////////////////////////////////////////////////////////////////////
+
+    function makeGenerationData() {
+        var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
+        var currgen = generation(gennum);
+
+        // Randomly create exactly popsize children
+        for (i=0; i < popsize; i++) {
+            var n = {id: dnodes.length},
+                p = currgen[Math.random() * currgen.length | 0]; // ?: * binds tighter than 0. This gives random int in [0,dnodes.length).
+            if (p.children) p.children.push(n); else p.children = [n];
+            dnodes.push(n);
+        }
+
+        // Recompute the layout and data join.
+        tree.nodes(root);
+        tree.links(dnodes);
+    }
+}
+
+function displayGenealogy(root, tree){
+    snodes = svg.selectAll(".node"),
+    slinks = svg.selectAll(".link");
+
+    // Recompute the layout and data join:
+    snodes = snodes.data(tree.nodes(root), function(d) { return d.id; }) // needed as separate step so toplevel snodes has correct value
+
+    snodes.enter()
+        .append("circle")
+        .attr("class", "node")
+        .style("fill", "white")
+        .style("stroke-width", nodeStrokeWidthUnmarked)
+        .attr("r", nodeRadius)
+        .attr("cx", function(d) { return d.px = d.x; })  // Note that in addition to placing the nodes, these modify data,
+        .attr("cy", function(d) { return d.py = d.y; })  // assigning x to px, etc. This must happen before call to line() below.
+            .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // we don't want root node, so just make it invisible (note Safari flashes it on momentarily)
+
+    // (Notes: re the assignments d.px = d.x, etc. above in attr calls:
+    // This assignment also returns the assigned value.
+    // It's possible to move the assignment to a separate earlier step using snodes.each().
+    // But then you *must* use d.x, d.y for the values of cx, cy.  px, py won't work.
+    // (Why? Maybe those get modified before that point?)
+
+    // Recompute the layout and data join:
+    slinks = slinks.data(tree.links(dnodes), function(d) { return d.source.id + "-" + d.target.id; }); // needed as separate step so toplevel slinks has correct value
+
+    slinks.enter().insert("path", ".node")
+        .attr("class", "link")
+        .style("stroke-width", linkStrokeWidthUnmarked)
+        .attr("d", line)  // Note line() is a function defined above/below.  Depends on d.px = d.x, etc. above
+            .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+}
+
+function generation (n) {
+    return dnodes.filter(function (d) {return d.depth === n;});
+}
+
+function ancestors (currnodes, stop, accnodes, acclinks) {
+   var newlinks = slinks.data().filter(function (d) {return currnodes.indexOf(d.target) !== -1;}); // links whose target node can be found in nods.
+   var newnodes = newlinks.map(function (d) {return d.source;});
+
+   if (stop(newnodes)) {
+       return {"nodes":accnodes.concat(newnodes), "links":acclinks.concat(newlinks)};
+   } else {
+       return ancestors(newnodes, stop, accnodes.concat(newnodes), acclinks.concat(newlinks));
+   }
+}
+
+function fillAncData (){
+    var gennum = Math.max.apply(Math, dnodes.map(function(d){return d.depth;}));
+    var currgen = generation(gennum);
+    ancdata = ancestors(currgen, function(ns){return ns[0].depth <= 1;}, currgen, []);
+    ancdata.nodes.forEach(function (d) {d.isAncestral = true;});  // side-effects global data nodes
+    ancdata.links.forEach(function (d) {d.isAncestral = true;});  // side-effects global data links
+    root.isAncestral = true;                                   // side-effects global root
+}
+
+function toggleMarked () {
+    if (ancestorsMarked) {
+        ancestorsMarked = false;
+        unmarkAncestors();
+    } else {
+        ancestorsMarked = true;
+        markAncestors();
+    }
+}
+
+function markAncestors () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata.nodes, function(d){return d.id;})
+        .style("stroke-width", nodeStrokeWidthMarked)
+        .exit()
+        .style("stroke-width", nodeStrokeWidthBackground);
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
+        .style("stroke-width", linkStrokeWidthMarked)
+        .exit()
+        .style("stroke-dasharray", "1,1");
+}
+
+function unmarkAncestors () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata.nodes, function(d){return d.id;})
+        .style("stroke-width", nodeStrokeWidthUnmarked)
+        .exit()
+        .style("stroke-width", nodeStrokeWidthUnmarked);
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
+        .style("stroke-width", linkStrokeWidthUnmarked)
+        .exit()
+        .style("stroke-dasharray", "none");
+}
+
+function toggleExtinct () {
+    if (extinctHidden) {
+        extinctHidden = false;
+        unhideExtinct();
+    } else {
+        extinctHidden = true;
+        hideExtinct();
+    }
+}
+
+function hideExtinct () {
+    if (!ancdata)
+        fillAncData();
+    snodes.data(ancdata.nodes, function(d){return d.id;})
+        .exit()
+        .attr("opacity", 0);
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
+        .exit()
+        .attr("opacity", 0);
+}
+
+function unhideExtinct () {
+    if (!ancdata)
+        fillAncData(); // should be redundant
+    snodes.data(ancdata.nodes, function(d){return d.id;})
+        .exit()
+        .attr("opacity", function (d) {return d.depth === 0 ? 0 : 1;}); // see note above
+    slinks.data(ancdata.links, function(d){return d.source.id + "-" + d.target.id;})
+        .exit()
+        .attr("opacity", function (d) {return d.source.depth === 0 ? 0 : 1;});
+}
+
+// Drop-in straight-line replacement for diagonal() based on elusive-code's answer at http://stackoverflow.com/a/20116569/1455243:
+function line(d){
+    var linemaker = d3.svg.line().x( function(point) { return point.lx; })  // lx, ly are abitrary names
+                                 .y( function(point) { return point.ly; }); // that are used in next lines.
+    return linemaker([{lx: d.source.x, ly: d.source.y},
+                      {lx: d.target.x, ly: d.target.y}]);
+}
+
+// Note when a new mutation arises in a lineage that already has mutations, 
+// the earlier mutations are stored but not displayed.  Only the most recent
+// mutation affects appearance.  A future version might make use of the other mutations.
+function mutate () {
+
+    // clear out old effects:
+    dnodes.forEach(function (d) {d.mutations = [];});
+    snodes.style("fill", "white");
+    slinks.style("stroke", "black");
+
+    // add mutations to the data nodes:
+    var mutation = 0; // id of mutation for a simple infinite-alleles model
+
+    // give every indiv the same chance of mutating, and propagate the mutation if so.
+    // (we could do the first step separately in a forEach over all indivs.)
+    for (i = 1; i <= generations; i++) {
+        dgen = generation(i);
+        dgen.forEach(function (d) {
+            if (Math.random() < mutationRate) {
+                d.mutations.unshift(mutation++); // most recent mutation is first in sequence
+        	propagateMutation(d);  // any mutation in a descendant will override some of these effects
+            }
+        });
+    }
+
+
+    // then show the mutations in the svg objects:
+    snodes.data(dnodes.filter(function (d) {return d.mutations;}), function (d) {return d.id;})
+        .style("fill", function (d) {return d.mutations.length ? mutationColors(d.mutations[0] % numMutationColors) : "white";});
+
+    // This changes link colors to parent organism's color.
+    //slinks.data(slinks.data().filter(function (d) {return d.source.mutations;}),
+    //            function(d) {return d.source.id + "-" + d.target.id;})
+    //    .style("stroke", function (d) {return d.source.mutations.length ? mutationColors(d.source.mutations[0] % numMutationColors) : "black";});
+}
+
+function propagateMutation (dnode) {
+    if (dnode.children) {
+        dnode.children.forEach(function (d) {
+            d.mutations = uniq(dnode.mutations.concat(d.mutations)); // dnode.mutations will contain most recent mutations
+            propagateMutation(d);
+        });
+    }
+}
+
+function printGenealogy () {
+    d3.select("#controls").style("visibility", "hidden");
+    window.print();
+    d3.select("#controls").style("visibility", "visible");
+}
+
+// This is simple.  More efficient ones at http://stackoverflow.com/questions/9229645/remove-duplicates-from-javascript-array:w
+function uniq (ra) {
+    return ra.filter (function (v, i, a) { return a.indexOf (v) == i });
+}
+
+</script>
+</body>
