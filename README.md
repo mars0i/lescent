@@ -29,7 +29,7 @@ notice" below.
 Specifically, lescent is a forward Wright-Fisher simulation with fixed
 population size, asexual reproduction, and no natural selection. 
 (Lescent's name reflects its pedagogical purpose, not its
-functioning.  It's not a coalescent simulation.) Mutations in lescent
+functioning.  It's not a coalescent simulation.)  Mutations in lescent
 are best thought of as following an infinite alleles model.  Each new
 color represents a new mutation, which replaces the old one. 
 (However, lescent uses a fixed number of colors, so the same color may
@@ -52,6 +52,11 @@ if necessary):
 
 The print button is useful for generating PDF diagrams, if your printing
 software can generate PDFs.
+
+In the full git repository, there are two versions of lescent:
+lescent.html, and lescentGrayScale.html.  The latter generates figures
+using shades of gray rather than colors, and it has different size
+settings.
 
 ### Things to notice:
 
