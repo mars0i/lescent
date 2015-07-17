@@ -91,7 +91,7 @@ lot of data is generated for no good reason.  To see this, try using the
 runs quickly, but that's because it simulates very few organisms in very
 few generations, with "genes" that consist of a few numbers.)
 
-So scientists studying evolutionary processes often use "coalescent"
+Thus, scientists studying evolutionary processes often use "coalescent"
 simulations, which generate lineages by starting from the present,
 then moving backward in time.  (In this way, lineages that won't reach
 the present are never generated at all.)  Although lescent is not a
@@ -149,4 +149,4 @@ population size.
 occurred  its ancestors. In that sense, lescent is more like an
 infinite sites model than an infinite alleles model.  However, at
 present, only the most recent mutation affects color, which is why I
-described above in terms of the infinite alleles model.
+described it above in terms of the infinite alleles model.
