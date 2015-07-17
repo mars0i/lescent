@@ -13,7 +13,7 @@ m a b r a m s &nbsp;&nbsp;at&nbsp;&nbsp; u a b
 &nbsp;&nbsp;dot&nbsp;&nbsp; e d u), and is distributed
 under the Gnu General Public License version 3.0, available in the
 file LICENSE at  <a
-href="https://github.com/mars0i/lescent/LICENSE">https://github.com/mars0i/lescent/LICENSE</a>.
+href="https://github.com/mars0i/lescent/blob/master/LICENSE">https://github.com/mars0i/lescent/blob/master/LICENSE</a>.
 
 If you find lescent useful, feel free to let me know.&nbsp; -Marshall
 
