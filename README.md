@@ -38,8 +38,7 @@ be reused for different mutations when there are many mutations.)
 
 ### How to use it:
 
-Experiment with the buttons.  Try clicking "New genealogy" first.  You
-may need to click on "Open in new window" first.
+Experiment with the buttons.  Try clicking "New genealogy" first.
 
 Lescent includes the following controls (first choose "Open in a new window"
 if necessary):
@@ -51,7 +50,7 @@ if necessary):
 * **de/emphasize non-extinct**: Emphasize lineages present in the last generation, de-emphasizing others.
 * **print**: Print the page without buttons and other controls.
 
-The print button is useful for generating PDF diagrams, if your printing
+The print button is useful for generating PDF diagrams if your printing
 software can generate PDFs.
 
 In the full git repository, there are two versions of lescent:
