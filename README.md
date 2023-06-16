@@ -71,11 +71,11 @@ genealogy", you'll see a simpler diagram, which you can then modify
 using the other buttons.)
 
 Usually, not all members of a population succeed in producing
-offspring who make it to adulthood.  This is likely to happen purely
-by chance, even without any influence of natural selection.  (This
+offspring that make it to adulthood.  This is likely to happen purely
+by chance, even without any influence of natural selection.  As a result of 
+this process, in each generation, some lineages are lost.  (This
 kind of random pruning is unlikely only when a population is growing
-*very* rapidly.)  As a result of this process, in each generation,
-some lineages are lost.  This happens over and over again, with the
+*very* rapidly.)  This happens over and over again, with the
 consequence that very few members of the initial population have
 descendants many generations later.  Many genetic variants are lost in
 this way, even after they spread.
@@ -129,9 +129,9 @@ Roberts and Company, 2009.
 * From <a href="http://bedford.io/projects">Trevor Bedford</a>:
 ancestry, coaltrace, divergence, haplotypes, stem, and nextflu. 
 
-* From the authors of the book *Gene Genealogies*, listed above:
+<!-- * From the authors of the book *Gene Genealogies*, listed above:
 The Wright-Fisher animator and Hudson animator at <a
-href="www.coalescent.dk">www.coalescent.dk</a>.
+href="www.coalescent.dk">www.coalescent.dk</a>. -->
 
 ### Miscellaneous:
 
