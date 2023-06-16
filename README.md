@@ -4,8 +4,8 @@ concepts.
 
 Live demo: <a href="http://members.logical.net/~marshall/lescent">http://members.logical.net/~marshall/lescent</a><br/>
 <!-- <a href="http://bl.ocks.org/mars0i/e08f6e578076560bf3bf">http://bl.ocks.org/mars0i/e08f6e578076560bf3bf</a><br/> -->
-Github gist page: <a href="https://gist.github.com/mars0i/e08f6e578076560bf3bf">https://gist.github.com/mars0i/e08f6e578076560bf3bf</a><br/>
-Full github repository with latest source code: <a href="https://github.com/mars0i/lescent">https://github.com/mars0i/lescent</a>
+<!-- Github gist page: <a href="https://gist.github.com/mars0i/e08f6e578076560bf3bf">https://gist.github.com/mars0i/e08f6e578076560bf3bf</a><br/> -->
+<!-- Full github repository with latest source code: <a href="https://github.com/mars0i/lescent">https://github.com/mars0i/lescent</a> -->
 
 This project began with modifications of Mike Bostock's <a href="http://bl.ocks.org/mbostock/999346">Random Tree</a>.
 All new text and software is copyright 2015 by Marshall Abrams (<a
